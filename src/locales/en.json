@@ -1,0 +1,74 @@
+{
+  "nav": {
+    "home": "Home",
+    "calendar": "Calendar",
+    "players": "Players",
+    "news": "News",
+    "history": "History",
+    "admin": "Admin",
+    "playerLogin": "Player Login",
+    "language": "Language"
+  },
+  "home": {
+    "hero": {
+      "title": "GOOMA UNITED",
+      "subtitle": "Passion, Excellence, Victory. Join us on our journey to greatness in Belgian football.",
+      "viewMatches": "View Matches",
+      "meetTeam": "Meet the Team"
+    },
+    "stats": {
+      "yearsExcellence": "Years of Excellence",
+      "leagueTitles": "League Titles",
+      "squadPlayers": "Squad Players",
+      "loyalFans": "Loyal Fans"
+    },
+    "upcomingMatches": {
+      "title": "Upcoming Matches",
+      "subtitle": "Don't miss our next games",
+      "loading": "Loading matches...",
+      "noMatches": "No upcoming matches scheduled",
+      "home": "Home",
+      "away": "Away",
+      "vs": "vs",
+      "venue": "Venue",
+      "viewFullCalendar": "View Full Calendar"
+    },
+    "latestNews": {
+      "title": "Latest News",
+      "subtitle": "Stay updated with team news",
+      "loading": "Loading news...",
+      "noNews": "No news articles available",
+      "readMore": "Read More",
+      "by": "By"
+    },
+    "teamSpirit": {
+      "title": "United We Stand",
+      "subtitle": "More than a team, we're a family. Join the Gooma United community and be part of our incredible journey.",
+      "ourHistory": "Our History",
+      "watchHighlights": "Watch Highlights"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "add": "Add",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "register": "Register",
+    "username": "Username",
+    "password": "Password",
+    "email": "Email",
+    "confirmPassword": "Confirm Password"
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "nav": {
+    "home": "Thuispagina",
+    "calendar": "Kalender",
+    "players": "Spelers",
+    "news": "Nieuws",
+    "history": "Geschiedenis",
+    "admin": "Admin",
+    "playerLogin": "Speler Login",
+    "language": "Taal"
+  },
+  "home": {
+    "hero": {
+      "title": "GOOMA UNITED",
+      "subtitle": "Passie, Uitmuntendheid, Overwinning. Sluit je aan bij onze reis naar grootsheid in de Belgische voetbal.",
+      "viewMatches": "Bekijk Wedstrijden",
+      "meetTeam": "Ontmoet het Team"
+    },
+    "stats": {
+      "yearsExcellence": "Jaren van Uitmuntendheid",
+      "leagueTitles": "Competitietitels",
+      "squadPlayers": "Selectiespelers",
+      "loyalFans": "Trouwe Fans"
+    },
+    "upcomingMatches": {
+      "title": "Aankomende Wedstrijden",
+      "subtitle": "Mis onze volgende wedstrijden niet",
+      "loading": "Wedstrijden laden...",
+      "noMatches": "Geen aankomende wedstrijden gepland",
+      "home": "Thuis",
+      "away": "Uit",
+      "vs": "vs",
+      "venue": "Locatie",
+      "viewFullCalendar": "Bekijk Volledige Kalender"
+    },
+    "latestNews": {
+      "title": "Laatste Nieuws",
+      "subtitle": "Blijf op de hoogte van teamnieuws",
+      "loading": "Nieuws laden...",
+      "noNews": "Geen nieuwsartikelen beschikbaar",
+      "readMore": "Lees Meer",
+      "by": "Door"
+    },
+    "teamSpirit": {
+      "title": "Samen Sterk",
+      "subtitle": "Meer dan een team, wij zijn een familie. Sluit je aan bij de Gooma United gemeenschap en maak deel uit van onze ongelooflijke reis.",
+      "ourHistory": "Onze Geschiedenis",
+      "watchHighlights": "Bekijk Hoogtepunten"
+    }
+  },
+  "common": {
+    "loading": "Laden...",
+    "error": "Fout",
+    "cancel": "Annuleren",
+    "save": "Opslaan",
+    "edit": "Bewerken",
+    "delete": "Verwijderen",
+    "add": "Toevoegen",
+    "search": "Zoeken",
+    "filter": "Filter",
+    "sort": "Sorteren",
+    "yes": "Ja",
+    "no": "Nee"
+  },
+  "auth": {
+    "login": "Inloggen",
+    "logout": "Uitloggen",
+    "register": "Registreren",
+    "username": "Gebruikersnaam",
+    "password": "Wachtwoord",
+    "email": "E-mail",
+    "confirmPassword": "Bevestig Wachtwoord"
+  }
+}
