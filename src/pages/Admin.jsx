@@ -374,14 +374,43 @@ const Admin = () => {
                         className="text-red-600"
                         onClick={async () => {
                           if (window.confirm('Are you sure you want to delete this match?')) {
+                            setLoading(true);
                             try {
                               console.log('Attempting to delete match:', match.id, match.opponent);
                               await deleteMatch(match.id);
-                              console.log('Match deleted successfully');
-                              await fetchData();
+                              console.log('Match deleted successfully from database');
+
+                              // Force refresh data immediately
+                              const [matchesData, playersData, newsData] = await Promise.all([
+                                getMatches(),
+                                getPlayers(),
+                                getNewsPosts()
+                              ]);
+                              setMatches(matchesData);
+                              setPlayers(playersData);
+                              setNews(newsData);
+
+                              console.log('UI updated with fresh data');
+                              alert('Match deleted successfully!');
                             } catch (error) {
                               console.error('Error deleting match:', error);
                               alert(`Error deleting match: ${error.message || 'Unknown error'}`);
+
+                              // Still refresh data even if delete failed
+                              try {
+                                const [matchesData, playersData, newsData] = await Promise.all([
+                                  getMatches(),
+                                  getPlayers(),
+                                  getNewsPosts()
+                                ]);
+                                setMatches(matchesData);
+                                setPlayers(playersData);
+                                setNews(newsData);
+                              } catch (refreshError) {
+                                console.error('Error refreshing data:', refreshError);
+                              }
+                            } finally {
+                              setLoading(false);
                             }
                           }
                         }}
