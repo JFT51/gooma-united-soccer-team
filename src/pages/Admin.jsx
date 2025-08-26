@@ -375,11 +375,13 @@ const Admin = () => {
                         onClick={async () => {
                           if (window.confirm('Are you sure you want to delete this match?')) {
                             try {
+                              console.log('Attempting to delete match:', match.id, match.opponent);
                               await deleteMatch(match.id);
+                              console.log('Match deleted successfully');
                               await fetchData();
                             } catch (error) {
                               console.error('Error deleting match:', error);
-                              alert('Error deleting match');
+                              alert(`Error deleting match: ${error.message || 'Unknown error'}`);
                             }
                           }
                         }}
