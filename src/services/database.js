@@ -13,29 +13,15 @@ import {
 } from 'firebase/firestore';
 import { db, storage } from '../lib/firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { auth } from '../lib/firebase';
 
 // Matches
 export const addMatch = async (matchData) => {
   try {
-    // Check if user is authenticated
-    if (!auth.currentUser) {
-      throw new Error('User must be authenticated to add matches');
-    }
-    
-    console.log('Adding match to Firestore:', matchData);
-    console.log('Current user:', auth.currentUser?.email);
     const docRef = await addDoc(collection(db, 'matches'), {
       ...matchData,
-      // Ensure date is properly formatted
-      date: matchData.date instanceof Date ? matchData.date : new Date(matchData.date),
-      // Add match status and type
-      status: matchData.status || 'upcoming',
-      isHome: matchData.type === 'home',
       createdAt: new Date(),
       updatedAt: new Date()
     });
-    console.log('Match added with ID:', docRef.id);
     return docRef.id;
   } catch (error) {
     console.error('Error adding match:', error);
@@ -58,22 +44,18 @@ export const uploadProfilePicture = async (file, userId) => {
 
 export const getMatches = async () => {
   try {
-    console.log('Fetching matches from Firestore...');
     const q = query(collection(db, 'matches'), orderBy('date', 'asc'));
     const querySnapshot = await getDocs(q);
-    const matches = querySnapshot.docs.map(doc => {
+    return querySnapshot.docs.map(doc => {
       const data = doc.data();
       return {
         id: doc.id,
         ...data,
-        // Handle different date formats
-        date: data.date?.toDate ? data.date : (data.date?.seconds ? { seconds: data.date.seconds } : new Date(data.date)),
+        date: data.date?.toDate ? data.date.toDate() : data.date,
         createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : data.createdAt,
         updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : data.updatedAt,
       };
     });
-    console.log('Fetched matches:', matches.length);
-    return matches;
   } catch (error) {
     console.error('Error getting matches:', error);
     throw error;
@@ -105,13 +87,6 @@ export const deleteMatch = async (matchId) => {
 // Players
 export const addPlayer = async (playerData) => {
   try {
-    // Check if user is authenticated
-    if (!auth.currentUser) {
-      throw new Error('User must be authenticated to add players');
-    }
-    
-    console.log('Adding player to Firestore:', playerData);
-    console.log('Current user:', auth.currentUser?.email);
     const docRef = await addDoc(collection(db, 'players'), {
       ...playerData,
       createdAt: new Date(),
@@ -126,22 +101,18 @@ export const addPlayer = async (playerData) => {
 
 export const getPlayers = async () => {
   try {
-    console.log('Fetching players from Firestore...');
     const q = query(collection(db, 'players'), orderBy('name', 'asc'));
     const querySnapshot = await getDocs(q);
-    const players = querySnapshot.docs.map(doc => {
+    return querySnapshot.docs.map(doc => {
       const data = doc.data();
       return {
         id: doc.id,
         ...data,
-        // Handle different date formats for birthDate
-        birthDate: data.birthDate?.toDate ? data.birthDate.toDate() : (typeof data.birthDate === 'string' ? data.birthDate : data.birthDate),
+        birthDate: data.birthDate?.toDate ? data.birthDate.toDate() : data.birthDate,
         createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : data.createdAt,
         updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : data.updatedAt,
       };
     });
-    console.log('Fetched players:', players.length);
-    return players;
   } catch (error) {
     console.error('Error getting players:', error);
     throw error;
@@ -213,13 +184,6 @@ export const deletePlayer = async (playerId) => {
 // News/Blog Posts
 export const addNewsPost = async (postData) => {
   try {
-    // Check if user is authenticated
-    if (!auth.currentUser) {
-      throw new Error('User must be authenticated to add news posts');
-    }
-    
-    console.log('Adding news post to Firestore:', postData);
-    console.log('Current user:', auth.currentUser?.email);
     const docRef = await addDoc(collection(db, 'news'), {
       ...postData,
       createdAt: new Date(),
@@ -234,14 +198,13 @@ export const addNewsPost = async (postData) => {
 
 export const getNewsPosts = async (limitCount = 10) => {
   try {
-    console.log('Fetching news posts from Firestore...');
     const q = query(
       collection(db, 'news'),
       orderBy('createdAt', 'desc'),
       limit(limitCount)
     );
     const querySnapshot = await getDocs(q);
-    const posts = querySnapshot.docs.map(doc => {
+    return querySnapshot.docs.map(doc => {
       const data = doc.data();
       return {
         id: doc.id,
@@ -250,8 +213,6 @@ export const getNewsPosts = async (limitCount = 10) => {
         updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : data.updatedAt,
       };
     });
-    console.log('Fetched news posts:', posts.length);
-    return posts;
   } catch (error) {
     console.error('Error getting news posts:', error);
     throw error;

@@ -1,37 +1,30 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow read access to all documents for everyone (public read)
-    match /{document=**} {
-      allow read: if true;
-    }
-    
-    // Matches collection - allow authenticated users to write
+    // Matches collection
     match /matches/{matchId} {
+      // Allow read for all users
+      allow read: if true;
+
+      // Allow write (create, update, delete) for authenticated users
       allow write: if request.auth != null;
     }
 
-    // Players collection - allow authenticated users to write
+    // Players collection
     match /players/{playerId} {
+      // Allow read for all users
+      allow read: if true;
+
+      // Allow write operations for authenticated users
       allow write: if request.auth != null;
-      // Allow players to read and write their own data
-      allow read, write: if request.auth != null && 
-        (request.auth.token.email == resource.data.email || 
-         request.auth.token.email == request.resource.data.email);
     }
 
-    // News collection - allow authenticated users to write
+    // News collection
     match /news/{newsId} {
-      allow write: if request.auth != null;
-    }
+      // Allow read for all users
+      allow read: if true;
 
-    // Teams collection - allow authenticated users to write
-    match /teams/{teamId} {
-      allow write: if request.auth != null;
-    }
-
-    // Venues collection - allow authenticated users to write
-    match /venues/{venueId} {
+      // Allow write operations for authenticated users
       allow write: if request.auth != null;
     }
 
@@ -39,9 +32,18 @@ service cloud.firestore {
     match /users/{userId} {
       // Allow users to read and write their own data
       allow read, write: if request.auth != null && request.auth.uid == userId;
-      
-      // Allow authenticated users to read user data (for role checking)
-      allow read: if request.auth != null;
+
+      // Allow admin users to read all user data
+      allow read: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Venues collection
+    match /venues/{venueId} {
+      // Allow read for all users
+      allow read: if true;
+
+      // Allow write operations for authenticated users
+      allow write: if request.auth != null;
     }
   }
 }

@@ -8,8 +8,6 @@ const Calendar = () => {
   const [filteredMatches, setFilteredMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // all, upcoming, completed, home, away
-  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
   useEffect(() => {
     const fetchMatches = async () => {
@@ -41,14 +39,8 @@ const Calendar = () => {
       filtered = filtered.filter(match => match.isHome === false);
     }
 
-    // Apply month/year filter
-    filtered = filtered.filter(match => {
-      const matchDate = match.date.seconds ? new Date(match.date.seconds * 1000) : new Date(match.date);
-      return matchDate.getMonth() === selectedMonth && matchDate.getFullYear() === selectedYear;
-    });
-
     setFilteredMatches(filtered);
-  }, [matches, filter, selectedMonth, selectedYear]);
+  }, [matches, filter]);
 
   const formatDate = (timestamp) => {
     if (!timestamp) return '';
@@ -91,13 +83,6 @@ const Calendar = () => {
         return 'bg-gray-100 text-gray-800';
     }
   };
-
-  const months = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ];
-
-  const years = [2024, 2025, 2026];
 
   if (loading) {
     return (
@@ -166,30 +151,6 @@ const Calendar = () => {
               </Button>
             </div>
 
-            <div className="flex gap-2">
-              <select
-                value={selectedMonth}
-                onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-              >
-                {months.map((month, index) => (
-                  <option key={index} value={index}>
-                    {month}
-                  </option>
-                ))}
-              </select>
-              <select
-                value={selectedYear}
-                onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-              >
-                {years.map(year => (
-                  <option key={year} value={year}>
-                    {year}
-                  </option>
-                ))}
-              </select>
-            </div>
           </div>
         </div>
 

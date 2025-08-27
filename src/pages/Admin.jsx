@@ -35,7 +35,6 @@ import {
   getTeams,
   updateTeam,
 } from '../services/database';
-import { auth } from '../lib/firebase';
 
 const Admin = () => {
   const { currentUser, logout } = useAuth();
@@ -91,10 +90,7 @@ const Admin = () => {
     console.log('Admin component mounted. currentUser:', currentUser);
     if (currentUser) {
       console.log('currentUser exists, calling fetchData...');
-      // Add a small delay to ensure auth state is fully established
-      setTimeout(() => {
-        fetchData();
-      }, 1000);
+      fetchData();
     } else {
       console.log('currentUser does not exist.');
     }
@@ -102,8 +98,6 @@ const Admin = () => {
 
   const fetchData = async () => {
     console.log('fetchData called');
-    console.log('Current user in fetchData:', currentUser?.email);
-    console.log('Auth current user:', auth.currentUser?.email);
     setLoading(true);
     try {
       console.log('Fetching data from Firestore...');
@@ -120,18 +114,6 @@ const Admin = () => {
       setTeams(teamsData);
     } catch (error) {
       console.error('Error in fetchData:', error);
-      console.error('Error details:', {
-        code: error.code,
-        message: error.message,
-        currentUser: currentUser?.email,
-        authCurrentUser: auth.currentUser?.email
-      });
-      // Show user-friendly error message
-      if (error.code === 'permission-denied') {
-        alert('Permission denied. Please make sure you are logged in as an admin and the Firestore rules are properly configured.');
-      } else {
-        alert(`Database connection error: ${error.message}. Please check your internet connection and try again.`);
-      }
     } finally {
       console.log('fetchData finished');
       setLoading(false);
@@ -170,20 +152,15 @@ const Admin = () => {
   const handleAddMatch = async () => {
     try {
       setLoading(true);
-      console.log('Adding match with data:', matchForm);
       await addMatch({
         ...matchForm,
-        date: new Date(`${matchForm.date}T${matchForm.time}`),
         createdAt: new Date()
       });
-      console.log('Match added successfully');
       await fetchData();
       setShowModal(false);
       resetMatchForm();
-      alert('Match added successfully!');
     } catch (error) {
       console.error('Error adding match:', error);
-      alert(`Error adding match: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -234,21 +211,17 @@ const Admin = () => {
   const handleAddNews = async () => {
     try {
       setLoading(true);
-      console.log('Adding news with data:', newsForm);
       await addNewsPost({
         ...newsForm,
         author: currentUser.email,
         tags: newsForm.tags.split(',').map(tag => tag.trim()),
         createdAt: new Date()
       });
-      console.log('News added successfully');
       await fetchData();
       setShowModal(false);
       resetNewsForm();
-      alert('News article added successfully!');
     } catch (error) {
       console.error('Error adding news:', error);
-      alert(`Error adding news: ${error.message}`);
     } finally {
       setLoading(false);
     }
