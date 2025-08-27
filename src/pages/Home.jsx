@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Calendar, Users, Trophy, ArrowRight, Play } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
+import teamCelebration from '../assets/team-celebration.jpg';
 import { getMatches, getNewsPosts } from '../services/database';
 
 const Home = () => {
@@ -39,9 +40,9 @@ const Home = () => {
   const formatDate = (timestamp) => {
     if (!timestamp) return '';
     const date = timestamp.seconds ? new Date(timestamp.seconds * 1000) : new Date(timestamp);
-    return date.toLocaleDateString('en-US', { 
-      weekday: 'short', 
-      month: 'short', 
+    return date.toLocaleDateString('en-US', {
+      weekday: 'short',
+      month: 'short',
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
@@ -255,7 +256,7 @@ const Home = () => {
       <section className="py-16 bg-black text-white relative overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-center opacity-30"
-          style={{ backgroundImage: `url('https://jft51.github.io/gooma-united-soccer-team/src/assets/hero04.jpg')` }}
+          style={{ backgroundImage: `url(${teamCelebration})` }}
         ></div>
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
