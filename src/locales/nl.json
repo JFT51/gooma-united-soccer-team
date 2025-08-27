@@ -70,5 +70,33 @@
     "password": "Wachtwoord",
     "email": "E-mail",
     "confirmPassword": "Bevestig Wachtwoord"
+  },
+  "players": {
+    "title": "Spelers",
+    "position": "Positie",
+    "dateOfBirth": "Geboortedatum",
+    "nationality": "Nationaliteit",
+    "jerseyNumber": "Rugnummer",
+    "loading": "Spelers laden...",
+    "noPlayers": "Geen spelers gevonden",
+    "viewProfile": "Bekijk Profiel"
+  },
+  "match": {
+    "details": {
+      "title": "Wedstrijd Details",
+      "date": "Datum",
+      "time": "Tijd",
+      "location": "Locatie",
+      "opponent": "Tegenstander",
+      "score": "Score",
+      "result": "Resultaat",
+      "goals": "Doelpunten",
+      "assists": "Assists",
+      "yellowCards": "Gele Kaarten",
+      "redCards": "Rode Kaarten",
+      "substitutions": "Wissels",
+      "loading": "Wedstrijd details laden...",
+      "noDetails": "Geen wedstrijd details beschikbaar"
+    }
   }
 }
