@@ -116,24 +116,24 @@ const Home = () => {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Club Statistics</h2>
-            <p className="text-red-100 text-lg">Our journey and achievements over the years</p>
+            <p className="text-2xl font-dancing">When Gooma is United, they will never be divided</p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div className="bg-white bg-opacity-10 rounded-xl p-6 backdrop-blur-sm transform hover:scale-105 transition-all duration-300 hover:bg-opacity-20">
-              <div className="text-4xl md:text-5xl font-bold mb-3 text-white">15</div>
-              <div className="text-red-100 font-medium">{t('home.stats.yearsExcellence')}</div>
+              <div className="text-4xl md:text-5xl font-bold mb-3 text-black">15</div>
+              <div className="text-red-800 font-medium">{t('home.stats.yearsExcellence')}</div>
             </div>
             <div className="bg-white bg-opacity-10 rounded-xl p-6 backdrop-blur-sm transform hover:scale-105 transition-all duration-300 hover:bg-opacity-20">
-              <div className="text-4xl md:text-5xl font-bold mb-3 text-white">3</div>
-              <div className="text-red-100 font-medium">{t('home.stats.leagueTitles')}</div>
+              <div className="text-4xl md:text-5xl font-bold mb-3 text-black">3</div>
+              <div className="text-red-800 font-medium">{t('home.stats.leagueTitles')}</div>
             </div>
             <div className="bg-white bg-opacity-10 rounded-xl p-6 backdrop-blur-sm transform hover:scale-105 transition-all duration-300 hover:bg-opacity-20">
-              <div className="text-4xl md:text-5xl font-bold mb-3 text-white">25</div>
-              <div className="text-red-100 font-medium">{t('home.stats.squadPlayers')}</div>
+              <div className="text-4xl md:text-5xl font-bold mb-3 text-black">25</div>
+              <div className="text-red-800 font-medium">{t('home.stats.squadPlayers')}</div>
             </div>
             <div className="bg-white bg-opacity-10 rounded-xl p-6 backdrop-blur-sm transform hover:scale-105 transition-all duration-300 hover:bg-opacity-20">
-              <div className="text-4xl md:text-5xl font-bold mb-3 text-white">10K</div>
-              <div className="text-red-100 font-medium">{t('home.stats.loyalFans')}</div>
+              <div className="text-4xl md:text-5xl font-bold mb-3 text-black">10K</div>
+              <div className="text-red-800 font-medium">{t('home.stats.loyalFans')}</div>
             </div>
           </div>
         </div>
