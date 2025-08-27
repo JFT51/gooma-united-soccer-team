@@ -211,28 +211,27 @@ const Calendar = () => {
                         </span>
                       </div>
                       
-                      <div className="flex items-center gap-4 mb-4">
-                        <div className="text-center">
-                          <div className="text-lg font-bold text-gray-900">Gooma United</div>
+                      <div className="flex items-center justify-center gap-4 mb-4">
+                        <div className="text-right flex-1">
+                          <div className="text-lg font-bold text-gray-900">
+                            {match.isHome ? "Gooma United" : match.opponent}
+                          </div>
                           {match.status === 'completed' && match.result && (
                             <div className="text-2xl font-bold text-red-600">
-                              {match.result.home}
+                              {match.isHome ? match.result.home : match.result.away}
                             </div>
                           )}
                         </div>
-                        
-                        <div className="text-center px-4">
+                        <div className="text-center px-2">
                           <div className="text-sm text-gray-500">VS</div>
-                          {match.status === 'completed' && match.result && (
-                            <div className="text-lg font-bold text-gray-600">-</div>
-                          )}
                         </div>
-                        
-                        <div className="text-center">
-                          <div className="text-lg font-bold text-gray-900">{match.opponent}</div>
+                        <div className="text-left flex-1">
+                          <div className="text-lg font-bold text-gray-900">
+                            {match.isHome ? match.opponent : "Gooma United"}
+                          </div>
                           {match.status === 'completed' && match.result && (
                             <div className="text-2xl font-bold text-gray-600">
-                              {match.result.away}
+                              {match.isHome ? match.result.away : match.result.home}
                             </div>
                           )}
                         </div>
