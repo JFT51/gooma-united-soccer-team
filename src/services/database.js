@@ -314,3 +314,50 @@ export const deleteVenue = async (venueId) => {
     throw error;
   }
 };
+
+// Teams
+export const addTeam = async (teamData) => {
+  try {
+    const docRef = await addDoc(collection(db, 'teams'), {
+      ...teamData,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+    return docRef.id;
+  } catch (error) {
+    console.error('Error adding team:', error);
+    throw error;
+  }
+};
+
+export const getTeams = async () => {
+  try {
+    const q = query(collection(db, 'teams'), orderBy('name', 'asc'));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+        createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : data.createdAt,
+        updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : data.updatedAt,
+      };
+    });
+  } catch (error) {
+    console.error('Error getting teams:', error);
+    throw error;
+  }
+};
+
+export const updateTeam = async (teamId, teamData) => {
+  try {
+    const teamRef = doc(db, 'teams', teamId);
+    await updateDoc(teamRef, {
+      ...teamData,
+      updatedAt: new Date()
+    });
+  } catch (error) {
+    console.error('Error updating team:', error);
+    throw error;
+  }
+};

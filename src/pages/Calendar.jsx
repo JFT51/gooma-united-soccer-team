@@ -8,8 +8,7 @@ const Calendar = () => {
   const [filteredMatches, setFilteredMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // all, upcoming, completed, home, away
-  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+
 
   useEffect(() => {
     const fetchMatches = async () => {
@@ -27,6 +26,8 @@ const Calendar = () => {
     fetchMatches();
   }, []);
 
+
+
   useEffect(() => {
     let filtered = matches;
 
@@ -40,15 +41,8 @@ const Calendar = () => {
     } else if (filter === 'away') {
       filtered = filtered.filter(match => match.isHome === false);
     }
-
-    // Apply month/year filter
-    filtered = filtered.filter(match => {
-      const matchDate = match.date.seconds ? new Date(match.date.seconds * 1000) : new Date(match.date);
-      return matchDate.getMonth() === selectedMonth && matchDate.getFullYear() === selectedYear;
-    });
-
     setFilteredMatches(filtered);
-  }, [matches, filter, selectedMonth, selectedYear]);
+  }, [matches, filter]);
 
   const formatDate = (timestamp) => {
     if (!timestamp) return '';
@@ -166,30 +160,7 @@ const Calendar = () => {
               </Button>
             </div>
 
-            <div className="flex gap-2">
-              <select
-                value={selectedMonth}
-                onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-              >
-                {months.map((month, index) => (
-                  <option key={index} value={index}>
-                    {month}
-                  </option>
-                ))}
-              </select>
-              <select
-                value={selectedYear}
-                onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-              >
-                {years.map(year => (
-                  <option key={year} value={year}>
-                    {year}
-                  </option>
-                ))}
-              </select>
-            </div>
+            
           </div>
         </div>
 
@@ -213,10 +184,12 @@ const Calendar = () => {
                       
                       <div className="flex items-center gap-4 mb-4">
                         <div className="text-center">
-                          <div className="text-lg font-bold text-gray-900">Gooma United</div>
+                          <div className="text-lg font-bold text-gray-900">
+                            {match.isHome ? 'Gooma United' : match.opponent}
+                          </div>
                           {match.status === 'completed' && match.result && (
                             <div className="text-2xl font-bold text-red-600">
-                              {match.result.home}
+                              {match.isHome ? match.result.home : match.result.away}
                             </div>
                           )}
                         </div>
@@ -229,10 +202,12 @@ const Calendar = () => {
                         </div>
                         
                         <div className="text-center">
-                          <div className="text-lg font-bold text-gray-900">{match.opponent}</div>
+                          <div className="text-lg font-bold text-gray-900">
+                            {match.isHome ? match.opponent : 'Gooma United'}
+                          </div>
                           {match.status === 'completed' && match.result && (
                             <div className="text-2xl font-bold text-gray-600">
-                              {match.result.away}
+                              {match.isHome ? match.result.away : match.result.home}
                             </div>
                           )}
                         </div>

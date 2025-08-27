@@ -30,6 +30,9 @@ import {
   deleteMatch,
   deletePlayer,
   deleteNewsPost,
+  addTeam,
+  getTeams,
+  updateTeam,
 } from '../services/database';
 
 const Admin = () => {
@@ -39,6 +42,7 @@ const Admin = () => {
   const [matches, setMatches] = useState([]);
   const [players, setPlayers] = useState([]);
   const [news, setNews] = useState([]);
+  const [teams, setTeams] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState('');
   const [editingItem, setEditingItem] = useState(null);
@@ -90,14 +94,16 @@ const Admin = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [matchesData, playersData, newsData] = await Promise.all([
+      const [matchesData, playersData, newsData, teamsData] = await Promise.all([
         getMatches(),
         getPlayers(),
-        getNewsPosts()
+        getNewsPosts(),
+        getTeams()
       ]);
       setMatches(matchesData);
       setPlayers(playersData);
       setNews(newsData);
+      setTeams(teamsData);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -367,14 +373,16 @@ const Admin = () => {
                               console.log('Match deleted successfully from database');
 
                               // Force refresh data immediately
-                              const [matchesData, playersData, newsData] = await Promise.all([
+                              const [matchesData, playersData, newsData, teamsData] = await Promise.all([
                                 getMatches(),
                                 getPlayers(),
-                                getNewsPosts()
+                                getNewsPosts(),
+                                getTeams()
                               ]);
                               setMatches(matchesData);
                               setPlayers(playersData);
                               setNews(newsData);
+                              setTeams(teamsData);
 
                               console.log('UI updated with fresh data');
                               alert('Match deleted successfully!');
@@ -384,14 +392,16 @@ const Admin = () => {
 
                               // Still refresh data even if delete failed
                               try {
-                                const [matchesData, playersData, newsData] = await Promise.all([
+                                const [matchesData, playersData, newsData, teamsData] = await Promise.all([
                                   getMatches(),
                                   getPlayers(),
-                                  getNewsPosts()
+                                  getNewsPosts(),
+                                  getTeams()
                                 ]);
                                 setMatches(matchesData);
                                 setPlayers(playersData);
                                 setNews(newsData);
+                                setTeams(teamsData);
                               } catch (refreshError) {
                                 console.error('Error refreshing data:', refreshError);
                               }
@@ -514,277 +524,113 @@ const Admin = () => {
     </div>
   );
 
-  const renderModal = () => {
-    if (!showModal) return null;
+  const renderTeams = () => {
+    const handlePopulateTeams = async () => {
+      setLoading(true);
+      try {
+        const allMatches = await getMatches();
+        const uniqueTeams = new Set();
+        uniqueTeams.add('Gooma United'); // Add the home team
+
+        allMatches.forEach(match => {
+          uniqueTeams.add(match.opponent);
+        });
+
+        for (const teamName of Array.from(uniqueTeams)) {
+          // Check if team already exists to prevent duplicates
+          const existingTeams = await getTeams();
+          const teamExists = existingTeams.some(team => team.name === teamName);
+
+          if (!teamExists) {
+            await addTeam({
+              name: teamName,
+              homeAddress: '',
+              clubColor1: '',
+              clubColor2: '',
+            });
+          }
+        }
+        await fetchData(); // Refresh data after populating
+        alert('Teams populated successfully!');
+      } catch (error) {
+        console.error('Error populating teams:', error);
+        alert('Error populating teams.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const handleUpdateTeamDetails = async (teamId, field, value) => {
+      setLoading(true);
+      try {
+        await updateTeam(teamId, { [field]: value });
+        await fetchData(); // Refresh data after update
+        alert('Team updated successfully!');
+      } catch (error) {
+        console.error('Error updating team:', error);
+        alert('Error updating team.');
+      } finally {
+        setLoading(false);
+      }
+    };
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-          <div className="p-6 border-b border-gray-200">
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-bold">
-                {editingItem ? 'Edit' : 'Add'} {modalType === 'match' ? 'Match' : modalType === 'player' ? 'Player' : 'News Article'}
-              </h3>
-              <Button variant="ghost" onClick={closeModal}>
-                <X size={20} />
-              </Button>
-            </div>
+      <div className="bg-white rounded-lg shadow-lg">
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-bold text-gray-900">Manage Teams</h2>
+            <Button onClick={handlePopulateTeams} className="bg-blue-600 hover:bg-blue-700">
+              Populate Teams (One-time)
+            </Button>
           </div>
-          <div className="p-6">
-            {modalType === 'match' && (
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Opponent</label>
-                  <input
-                    type="text"
-                    value={matchForm.opponent}
-                    onChange={(e) => setMatchForm({...matchForm, opponent: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
-                    <input
-                      type="date"
-                      value={matchForm.date}
-                      onChange={(e) => setMatchForm({...matchForm, date: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Time</label>
-                    <input
-                      type="time"
-                      value={matchForm.time}
-                      onChange={(e) => setMatchForm({...matchForm, time: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Venue</label>
-                  <input
-                    type="text"
-                    value={matchForm.venue}
-                    onChange={(e) => setMatchForm({...matchForm, venue: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
-                    <select
-                      value={matchForm.type}
-                      onChange={(e) => setMatchForm({...matchForm, type: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                    >
-                      <option value="home">Home</option>
-                      <option value="away">Away</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Competition</label>
-                    <select
-                      value={matchForm.competition}
-                      onChange={(e) => setMatchForm({...matchForm, competition: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                    >
-                      <option value="League">League</option>
-                      <option value="Cup">Cup</option>
-                      <option value="European">European</option>
-                      <option value="Friendly">Friendly</option>
-                    </select>
-                  </div>
-                </div>
-                <div className="flex justify-end gap-2 pt-4">
-                  <Button variant="outline" onClick={closeModal}>Cancel</Button>
-                  <Button onClick={handleAddMatch} disabled={loading} className="bg-red-600 hover:bg-red-700">
-                    {loading ? 'Saving...' : 'Save Match'}
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            {modalType === 'player' && (
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                  <input
-                    type="text"
-                    value={playerForm.name}
-                    onChange={(e) => setPlayerForm({...playerForm, name: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Position</label>
-                    <select
-                      value={playerForm.position}
-                      onChange={(e) => setPlayerForm({...playerForm, position: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                    >
-                      <option value="">Select Position</option>
-                      <option value="Goalkeeper">Goalkeeper</option>
-                      <option value="Defender">Defender</option>
-                      <option value="Midfielder">Midfielder</option>
-                      <option value="Forward">Forward</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Jersey Number</label>
-                    <input
-                      type="number"
-                      value={playerForm.jerseyNumber}
-                      onChange={(e) => setPlayerForm({...playerForm, jerseyNumber: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                  <input
-                    type="email"
-                    value={playerForm.email}
-                    onChange={(e) => setPlayerForm({...playerForm, email: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                    disabled={!!editingItem} // Disable email editing for existing players
-                  />
-                </div>
-                {!editingItem && ( // Only show password field for new players
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                    <input
-                      type="password"
-                      value={playerForm.password}
-                      onChange={(e) => setPlayerForm({...playerForm, password: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                    />
-                  </div>
-                )}
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Birth Date</label>
-                    <input
-                      type="date"
-                      value={playerForm.birthDate}
-                      onChange={(e) => setPlayerForm({...playerForm, birthDate: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                    />
-                  </div>
-                  
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Nationality</label>
-                  <input
-                    type="text"
-                    value={playerForm.nationality}
-                    onChange={(e) => setPlayerForm({...playerForm, nationality: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Surname</label>
-                  <input
-                    type="text"
-                    value={playerForm.surname}
-                    onChange={(e) => setPlayerForm({...playerForm, surname: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                  />
-                </div>
-                {/* Profile Picture Upload */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Profile Picture</label>
-                  <div className="grid grid-cols-3 gap-4">
-                    {playerImages.map((image) => (
-                        <img
-                            key={image}
-                            src={`https://jft51.github.io/gooma-united-soccer-team/src/assets/${image}`}
-                            alt={image}
-                            className={`w-24 h-24 object-cover rounded-full cursor-pointer ${playerForm.profilePicture === `https://jft51.github.io/gooma-united-soccer-team/src/assets/${image}` ? 'border-4 border-red-500' : ''}`}
-                            onClick={() => setPlayerForm({ ...playerForm, profilePicture: `https://jft51.github.io/gooma-united-soccer-team/src/assets/${image}` })}
-                        />
-                    ))}
-                  </div>
-                  {playerForm.profilePicture && (
-                    <img src={playerForm.profilePicture} alt="Profile" className="mt-2 h-20 w-20 object-cover rounded-full" />
-                  )}
-                </div>
-                <div className="flex justify-end gap-2 pt-4">
-                  <Button variant="outline" onClick={closeModal}>Cancel</Button>
-                  <Button onClick={handleAddPlayer} disabled={loading} className="bg-red-600 hover:bg-red-700">
-                    {loading ? 'Saving...' : 'Save Player'}
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            {modalType === 'news' && (
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                  <input
-                    type="text"
-                    value={newsForm.title}
-                    onChange={(e) => setNewsForm({...newsForm, title: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                    <select
-                      value={newsForm.category}
-                      onChange={(e) => setNewsForm({...newsForm, category: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                    >
-                      <option value="Match Results">Match Results</option>
-                      <option value="Transfers">Transfers</option>
-                      <option value="Training">Training</option>
-                      <option value="Community">Community</option>
-                      <option value="Tickets">Tickets</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Tags (comma separated)</label>
-                    <input
-                      type="text"
-                      value={newsForm.tags}
-                      onChange={(e) => setNewsForm({...newsForm, tags: e.target.value})}
-                      placeholder="e.g. victory, championship, final"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Content</label>
-                  <textarea
-                    value={newsForm.content}
-                    onChange={(e) => setNewsForm({...newsForm, content: e.target.value})}
-                    rows={6}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                  />
-                </div>
-                <div>
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={newsForm.featured}
-                      onChange={(e) => setNewsForm({...newsForm, featured: e.target.checked})}
-                      className="rounded border-gray-300 text-red-600 focus:ring-red-500"
-                    />
-                    <span className="text-sm font-medium text-gray-700">Featured Article</span>
-                  </label>
-                </div>
-                <div className="flex justify-end gap-2 pt-4">
-                  <Button variant="outline" onClick={closeModal}>Cancel</Button>
-                  <Button onClick={handleAddNews} disabled={loading} className="bg-red-600 hover:bg-red-700">
-                    {loading ? 'Saving...' : 'Save Article'}
-                  </Button>
-                </div>
-              </div>
-            )}
+        </div>
+        <div className="p-6">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b">
+                  <th className="text-left py-2">Team Name</th>
+                  <th className="text-left py-2">Home Address</th>
+                  <th className="text-left py-2">Club Color 1</th>
+                  <th className="text-left py-2">Club Color 2</th>
+                  <th className="text-left py-2">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {teams.map((team) => (
+                  <tr key={team.id} className="border-b">
+                    <td className="py-2">{team.name}</td>
+                    <td className="py-2">
+                      <input
+                        type="text"
+                        value={team.homeAddress}
+                        onChange={(e) => handleUpdateTeamDetails(team.id, 'homeAddress', e.target.value)}
+                        className="w-full px-2 py-1 border border-gray-300 rounded-md"
+                      />
+                    </td>
+                    <td className="py-2">
+                      <input
+                        type="color"
+                        value={team.clubColor1}
+                        onChange={(e) => handleUpdateTeamDetails(team.id, 'clubColor1', e.target.value)}
+                        className="w-10 h-10 cursor-pointer"
+                      />
+                    </td>
+                    <td className="py-2">
+                      <input
+                        type="color"
+                        value={team.clubColor2}
+                        onChange={(e) => handleUpdateTeamDetails(team.id, 'clubColor2', e.target.value)}
+                        className="w-10 h-10 cursor-pointer"
+                      />
+                    </td>
+                    <td className="py-2">
+                      {/* No specific delete for teams, as they are derived from matches */}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
@@ -816,7 +662,8 @@ const Admin = () => {
               { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
               { id: 'matches', label: 'Matches', icon: Calendar },
               { id: 'players', label: 'Players', icon: Users },
-              { id: 'news', label: 'News', icon: FileText }
+              { id: 'news', label: 'News', icon: FileText },
+              { id: 'teams', label: 'Teams', icon: Users }
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -847,6 +694,7 @@ const Admin = () => {
             {activeTab === 'matches' && renderMatches()}
             {activeTab === 'players' && renderPlayers()}
             {activeTab === 'news' && renderNews()}
+            {activeTab === 'teams' && renderTeams()}
           </>
         )}
       </div>
