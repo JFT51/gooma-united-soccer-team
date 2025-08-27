@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import React, { useState, useEffect } from 'react';
 import { User, MapPin, Calendar, Trophy, Target, Users, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getPlayers } from '../services/database.js';
