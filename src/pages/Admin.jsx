@@ -30,7 +30,6 @@ import {
   deleteMatch,
   deletePlayer,
   deleteNewsPost,
-  getMatches as getAllMatches,
   getTeamByName,
   addTeam,
   getTeams,
@@ -116,7 +115,7 @@ const Admin = () => {
   const handlePopulateTeams = async () => {
     setLoading(true);
     try {
-      const matches = await getAllMatches();
+      const matches = await getMatches();
       const teamNames = new Set(matches.map(match => match.opponent));
       teamNames.add("Gooma United");
 
