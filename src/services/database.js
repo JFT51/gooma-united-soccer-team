@@ -175,8 +175,7 @@ export const updatePlayer = async (playerId, playerData) => {
 export const deletePlayer = async (playerId) => {
   try {
     await deleteDoc(doc(db, 'players', playerId));
-  } catch (error)
-{
+  } catch (error) {
     console.error('Error deleting player:', error);
     throw error;
   }
