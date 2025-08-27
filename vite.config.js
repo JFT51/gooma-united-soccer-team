@@ -4,6 +4,7 @@ import path from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: '/', // Ensure correct asset paths on deployment
   plugins: [react()],
   resolve: {
     alias: {
