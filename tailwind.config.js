@@ -8,6 +8,7 @@ export default {
     extend: {
       fontFamily: {
         'dancing': ['"Dancing Script"', 'cursive'],
+        'gochi': ['"Gochi Hand"', 'cursive'],
       },
     },
   },
