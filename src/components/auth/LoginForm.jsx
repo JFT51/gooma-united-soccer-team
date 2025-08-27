@@ -58,6 +58,7 @@ const LoginForm = ({ onSuccess, title = "Login", userType = "user" }) => {
               required
               className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-colors"
               placeholder="Enter your email"
+              autoComplete="email"
             />
           </div>
         </div>
@@ -76,6 +77,7 @@ const LoginForm = ({ onSuccess, title = "Login", userType = "user" }) => {
               required
               className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-colors"
               placeholder="Enter your password"
+              autoComplete="current-password"
             />
             <button
               type="button"

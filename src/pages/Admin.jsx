@@ -87,27 +87,35 @@ const Admin = () => {
   });
 
   useEffect(() => {
+    console.log('Admin component mounted. currentUser:', currentUser);
     if (currentUser) {
+      console.log('currentUser exists, calling fetchData...');
       fetchData();
+    } else {
+      console.log('currentUser does not exist.');
     }
   }, [currentUser]);
 
   const fetchData = async () => {
+    console.log('fetchData called');
     setLoading(true);
     try {
+      console.log('Fetching data from Firestore...');
       const [matchesData, playersData, newsData, teamsData] = await Promise.all([
         getMatches(),
         getPlayers(),
         getNewsPosts(),
         getTeams()
       ]);
+      console.log('Data fetched successfully:', { matchesData, playersData, newsData, teamsData });
       setMatches(matchesData);
       setPlayers(playersData);
       setNews(newsData);
       setTeams(teamsData);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('Error in fetchData:', error);
     } finally {
+      console.log('fetchData finished');
       setLoading(false);
     }
   };
@@ -317,7 +325,9 @@ const Admin = () => {
     );
   }
 
-  const renderDashboard = () => (
+  const renderDashboard = () => {
+    console.log('Rendering Dashboard. State:', { matches, players, news });
+    return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
       <div className="bg-white rounded-lg shadow-lg p-6">
         <div className="flex items-center justify-between">
@@ -358,7 +368,7 @@ const Admin = () => {
         </div>
       </div>
     </div>
-  );
+  )};
 
   const renderTeams = () => {
     const handleTeamUpdate = (id, field, value) => {
@@ -652,41 +662,49 @@ const Admin = () => {
             {modalType === 'match' && (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Opponent</label>
+                  <label htmlFor="opponent" className="block text-sm font-medium text-gray-700 mb-1">Opponent</label>
                   <input
+                    id="opponent"
                     type="text"
                     value={matchForm.opponent}
                     onChange={(e) => setMatchForm({...matchForm, opponent: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    autoComplete="organization"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                    <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1">Date</label>
                     <input
+                      id="date"
                       type="date"
                       value={matchForm.date}
                       onChange={(e) => setMatchForm({...matchForm, date: e.target.value})}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                      autoComplete="off"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Time</label>
+                    <label htmlFor="time" className="block text-sm font-medium text-gray-700 mb-1">Time</label>
                     <input
+                      id="time"
                       type="time"
                       value={matchForm.time}
                       onChange={(e) => setMatchForm({...matchForm, time: e.target.value})}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                      autoComplete="off"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Venue</label>
+                  <label htmlFor="venue" className="block text-sm font-medium text-gray-700 mb-1">Venue</label>
                   <input
+                    id="venue"
                     type="text"
                     value={matchForm.venue}
                     onChange={(e) => setMatchForm({...matchForm, venue: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    autoComplete="off"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
@@ -727,21 +745,25 @@ const Admin = () => {
             {modalType === 'player' && (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Name</label>
                   <input
+                    id="name"
                     type="text"
                     value={playerForm.name}
                     onChange={(e) => setPlayerForm({...playerForm, name: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    autoComplete="name"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Position</label>
+                    <label htmlFor="position" className="block text-sm font-medium text-gray-700 mb-1">Position</label>
                     <select
+                      id="position"
                       value={playerForm.position}
                       onChange={(e) => setPlayerForm({...playerForm, position: e.target.value})}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                      autoComplete="organization-title"
                     >
                       <option value="">Select Position</option>
                       <option value="Goalkeeper">Goalkeeper</option>
@@ -751,64 +773,76 @@ const Admin = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Jersey Number</label>
+                    <label htmlFor="jerseyNumber" className="block text-sm font-medium text-gray-700 mb-1">Jersey Number</label>
                     <input
+                      id="jerseyNumber"
                       type="number"
                       value={playerForm.jerseyNumber}
                       onChange={(e) => setPlayerForm({...playerForm, jerseyNumber: e.target.value})}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                      autoComplete="off"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                   <input
+                    id="email"
                     type="email"
                     value={playerForm.email}
                     onChange={(e) => setPlayerForm({...playerForm, email: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
                     disabled={!!editingItem} // Disable email editing for existing players
+                    autoComplete="email"
                   />
                 </div>
                 {!editingItem && ( // Only show password field for new players
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">Password</label>
                     <input
+                      id="password"
                       type="password"
                       value={playerForm.password}
                       onChange={(e) => setPlayerForm({...playerForm, password: e.target.value})}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                      autoComplete="new-password"
                     />
                   </div>
                 )}
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Birth Date</label>
+                    <label htmlFor="birthDate" className="block text-sm font-medium text-gray-700 mb-1">Birth Date</label>
                     <input
+                      id="birthDate"
                       type="date"
                       value={playerForm.birthDate}
                       onChange={(e) => setPlayerForm({...playerForm, birthDate: e.target.value})}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                      autoComplete="bday"
                     />
                   </div>
                   
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Nationality</label>
+                  <label htmlFor="nationality" className="block text-sm font-medium text-gray-700 mb-1">Nationality</label>
                   <input
+                    id="nationality"
                     type="text"
                     value={playerForm.nationality}
                     onChange={(e) => setPlayerForm({...playerForm, nationality: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    autoComplete="country-name"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Surname</label>
+                  <label htmlFor="surname" className="block text-sm font-medium text-gray-700 mb-1">Surname</label>
                   <input
+                    id="surname"
                     type="text"
                     value={playerForm.surname}
                     onChange={(e) => setPlayerForm({...playerForm, surname: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    autoComplete="family-name"
                   />
                 </div>
                 {/* Profile Picture Upload */}
@@ -841,21 +875,25 @@ const Admin = () => {
             {modalType === 'news' && (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                  <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">Title</label>
                   <input
+                    id="title"
                     type="text"
                     value={newsForm.title}
                     onChange={(e) => setNewsForm({...newsForm, title: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    autoComplete="off"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                    <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">Category</label>
                     <select
+                      id="category"
                       value={newsForm.category}
                       onChange={(e) => setNewsForm({...newsForm, category: e.target.value})}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                      autoComplete="off"
                     >
                       <option value="Match Results">Match Results</option>
                       <option value="Transfers">Transfers</option>
@@ -865,28 +903,33 @@ const Admin = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Tags (comma separated)</label>
+                    <label htmlFor="tags" className="block text-sm font-medium text-gray-700 mb-1">Tags (comma separated)</label>
                     <input
+                      id="tags"
                       type="text"
                       value={newsForm.tags}
                       onChange={(e) => setNewsForm({...newsForm, tags: e.target.value})}
                       placeholder="e.g. victory, championship, final"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                      autoComplete="off"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Content</label>
+                  <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-1">Content</label>
                   <textarea
+                    id="content"
                     value={newsForm.content}
                     onChange={(e) => setNewsForm({...newsForm, content: e.target.value})}
                     rows={6}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    autoComplete="off"
                   />
                 </div>
                 <div>
-                  <label className="flex items-center gap-2">
+                  <label htmlFor="featured" className="flex items-center gap-2">
                     <input
+                      id="featured"
                       type="checkbox"
                       checked={newsForm.featured}
                       onChange={(e) => setNewsForm({...newsForm, featured: e.target.checked})}
@@ -909,6 +952,7 @@ const Admin = () => {
     );
   };
 
+  try {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -974,6 +1018,10 @@ const Admin = () => {
       {renderModal()}
     </div>
   );
+  } catch (error) {
+    console.error("Error rendering Admin component:", error);
+    return <div>An error occurred. Please check the console.</div>;
+  }
 };
 
 export default Admin;
