@@ -100,7 +100,7 @@ export const addPlayer = async (playerData) => {
 
 export const getPlayers = async () => {
   try {
-    const q = query(collection(db, 'players'), orderBy('jerseyNumber', 'asc'));
+    const q = query(collection(db, 'players'), orderBy('name', 'asc'));
     const querySnapshot = await getDocs(q);
     return querySnapshot.docs.map(doc => {
       const data = doc.data();
