@@ -1,38 +1,38 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow read access to all documents for authenticated users
-    match /{document=**} {
-      allow read: if request.auth != null;
-    }
-    
-    // Admin collection rules
-    match /admin/{document=**} {
-      allow read, write: if request.auth != null && 
-        get(/databases/$(database)/documents/admin/$(request.auth.uid)).data.role == 'admin';
-    }
-    
-    // Players collection rules
-    match /players/{playerId} {
-      allow read: if true;
-      allow write: if request.auth != null && 
-        get(/databases/$(database)/documents/admin/$(request.auth.uid)).data.role == 'admin';
-    }
-    
-    // Matches collection rules
+    // Matches collection
     match /matches/{matchId} {
+      // Allow read for all users
       allow read: if true;
-      allow write: if request.auth != null && 
-        get(/databases/$(database)/documents/admin/$(request.auth.uid)).data.role == 'admin';
+
+      // Allow write (create, update, delete) for authenticated users
+      allow write: if request.auth != null;
     }
 
-    // Teams collection rules
-    match /teams/{teamId} {
+    // Players collection
+    match /players/{playerId} {
+      // Allow read for all users
       allow read: if true;
-      allow write: if request.auth != null && 
-        get(/databases/$(database)/documents/admin/$(request.auth.uid)).data.role == 'admin';
+
+      // Allow write operations for authenticated users
+      allow write: if request.auth != null;
     }
-  }
+
+    // News collection
+    match /news/{newsId} {
+      // Allow read for all users
+      allow read: if true;
+
+      // Allow write operations for authenticated users
+      allow write: if request.auth != null;
+    }
+
+    // Users collection (for user roles)
+    match /users/{userId} {
+      // Allow users to read and write their own data
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+
       // Allow admin users to read all user data
       allow read: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
