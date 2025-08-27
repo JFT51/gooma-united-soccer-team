@@ -70,5 +70,53 @@
     "password": "Password",
     "email": "Email",
     "confirmPassword": "Confirm Password"
+  },
+  "players": {
+    "title": "Players",
+    "subtitle": "Meet the talented squad of Gooma United",
+    "position": "Position",
+    "dateOfBirth": "Date of Birth",
+    "nationality": "Nationality",
+    "jerseyNumber": "Jersey Number",
+    "loading": "Loading players...",
+    "noPlayers": "No players found",
+    "viewProfile": "View Profile",
+    "positions": {
+      "all": "All",
+      "goalkeeper": "Goalkeeper",
+      "defender": "Defender",
+      "midfielder": "Midfielder",
+      "forward": "Forward"
+    },
+    "ageDisplay": "Age: {{age}} years old",
+    "ageNotAvailable": "Age not available",
+    "matches": "Matches",
+    "cleanSheets": "Clean Sheets",
+    "goals": "Goals",
+    "saves": "Saves",
+    "assists": "Assists",
+    "noPlayersFilter": "No players found matching the selected position filter.",
+    "playerInfo": "Player Info",
+    "seasonStats": "Season Stats",
+    "matchesPlayed": "Matches Played",
+    "surname": "Surname"
+  },
+  "match": {
+    "details": {
+      "title": "Match Details",
+      "date": "Date",
+      "time": "Time",
+      "location": "Location",
+      "opponent": "Opponent",
+      "score": "Score",
+      "result": "Result",
+      "goals": "Goals",
+      "assists": "Assists",
+      "yellowCards": "Yellow Cards",
+      "redCards": "Red Cards",
+      "substitutions": "Substitutions",
+      "loading": "Loading match details...",
+      "noDetails": "No match details available"
+    }
   }
 }

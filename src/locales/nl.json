@@ -88,7 +88,8 @@
       "midfielder": "Middenvelder",
       "forward": "Aanvaller"
     },
-    "ageDisplay": "{{age}} jaar oud",
+    "ageDisplay": "Leeftijd: {{age}} jaar oud",
+    "ageNotAvailable": "Leeftijd niet beschikbaar",
     "matches": "Wedstrijden",
     "cleanSheets": "Clean Sheets",
     "goals": "Doelpunten",
@@ -96,7 +97,6 @@
     "assists": "Assists",
     "noPlayersFilter": "Geen spelers gevonden die overeenkomen met de geselecteerde positie.",
     "playerInfo": "Spelerinformatie",
-    "age": "Leeftijd",
     "seasonStats": "Seizoensstatistieken",
     "matchesPlayed": "Gespeelde wedstrijden",
     "surname": "Achternaam"
