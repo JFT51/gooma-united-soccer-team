@@ -1,32 +1,41 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar as CalendarIcon, MapPin, Clock, Filter, Trophy, Home, Plane } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { getMatches } from '../services/database';
+import { getMatches, getTeams } from '../services/database';
 
 const Calendar = () => {
   const [matches, setMatches] = useState([]);
+  const [teams, setTeams] = useState([]);
   const [filteredMatches, setFilteredMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // all, upcoming, completed, home, away
 
   useEffect(() => {
-    const fetchMatches = async () => {
+    const fetchData = async () => {
       try {
-        const matchData = await getMatches();
+        const [matchData, teamData] = await Promise.all([getMatches(), getTeams()]);
         setMatches(matchData);
+        setTeams(teamData);
         setFilteredMatches(matchData);
       } catch (error) {
-        console.error('Error fetching matches:', error);
+        console.error('Error fetching data:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchMatches();
+    fetchData();
   }, []);
 
   useEffect(() => {
-    let filtered = matches;
+    let filtered = matches.map(match => {
+      const homeTeamName = match.isHome ? "Gooma United" : match.opponent;
+      const homeTeam = teams.find(team => team.name === homeTeamName);
+      return {
+        ...match,
+        venue: homeTeam ? homeTeam.home_address : match.venue
+      };
+    });
 
     // Apply status filter
     if (filter === 'upcoming') {
@@ -40,7 +49,7 @@ const Calendar = () => {
     }
 
     setFilteredMatches(filtered);
-  }, [matches, filter]);
+  }, [matches, filter, teams]);
 
   const formatDate = (timestamp) => {
     if (!timestamp) return '';

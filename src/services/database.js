@@ -51,6 +51,7 @@ export const getMatches = async () => {
       return {
         id: doc.id,
         ...data,
+        isHome: data.type === 'home',
         date: data.date?.toDate ? data.date.toDate() : data.date,
         createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : data.createdAt,
         updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : data.updatedAt,
