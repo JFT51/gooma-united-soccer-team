@@ -140,8 +140,7 @@ const Players = () => {
                 <p className="text-md text-gray-600 mb-2">{player.surname}</p>
                 <div className="space-y-2 text-sm text-gray-600 mb-4">
                   <div className="flex items-center gap-2">
-                    <Calendar size={16} />
-                    <span>{player.age} {t('players.yearsOld')}</span>
+                    <span>{t('players.age')}: {player.age} {t('players.years')}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <MapPin size={16} />
