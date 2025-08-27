@@ -17,11 +17,18 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 // Matches
 export const addMatch = async (matchData) => {
   try {
+    console.log('Adding match to Firestore:', matchData);
     const docRef = await addDoc(collection(db, 'matches'), {
       ...matchData,
+      // Ensure date is properly formatted
+      date: matchData.date instanceof Date ? matchData.date : new Date(matchData.date),
+      // Add match status and type
+      status: matchData.status || 'upcoming',
+      isHome: matchData.type === 'home',
       createdAt: new Date(),
       updatedAt: new Date()
     });
+    console.log('Match added with ID:', docRef.id);
     return docRef.id;
   } catch (error) {
     console.error('Error adding match:', error);
@@ -44,18 +51,22 @@ export const uploadProfilePicture = async (file, userId) => {
 
 export const getMatches = async () => {
   try {
+    console.log('Fetching matches from Firestore...');
     const q = query(collection(db, 'matches'), orderBy('date', 'asc'));
     const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => {
+    const matches = querySnapshot.docs.map(doc => {
       const data = doc.data();
       return {
         id: doc.id,
         ...data,
-        date: data.date?.toDate ? data.date.toDate() : data.date,
+        // Handle different date formats
+        date: data.date?.toDate ? data.date : (data.date?.seconds ? { seconds: data.date.seconds } : new Date(data.date)),
         createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : data.createdAt,
         updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : data.updatedAt,
       };
     });
+    console.log('Fetched matches:', matches.length);
+    return matches;
   } catch (error) {
     console.error('Error getting matches:', error);
     throw error;
@@ -101,18 +112,22 @@ export const addPlayer = async (playerData) => {
 
 export const getPlayers = async () => {
   try {
+    console.log('Fetching players from Firestore...');
     const q = query(collection(db, 'players'), orderBy('name', 'asc'));
     const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => {
+    const players = querySnapshot.docs.map(doc => {
       const data = doc.data();
       return {
         id: doc.id,
         ...data,
-        birthDate: data.birthDate?.toDate ? data.birthDate.toDate() : data.birthDate,
+        // Handle different date formats for birthDate
+        birthDate: data.birthDate?.toDate ? data.birthDate.toDate() : (typeof data.birthDate === 'string' ? data.birthDate : data.birthDate),
         createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : data.createdAt,
         updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : data.updatedAt,
       };
     });
+    console.log('Fetched players:', players.length);
+    return players;
   } catch (error) {
     console.error('Error getting players:', error);
     throw error;
@@ -198,13 +213,14 @@ export const addNewsPost = async (postData) => {
 
 export const getNewsPosts = async (limitCount = 10) => {
   try {
+    console.log('Fetching news posts from Firestore...');
     const q = query(
       collection(db, 'news'),
       orderBy('createdAt', 'desc'),
       limit(limitCount)
     );
     const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map(doc => {
+    const posts = querySnapshot.docs.map(doc => {
       const data = doc.data();
       return {
         id: doc.id,
@@ -213,6 +229,8 @@ export const getNewsPosts = async (limitCount = 10) => {
         updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : data.updatedAt,
       };
     });
+    console.log('Fetched news posts:', posts.length);
+    return posts;
   } catch (error) {
     console.error('Error getting news posts:', error);
     throw error;
