@@ -7,8 +7,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        'montserrat': ['"Montserrat"', 'sans-serif'],
-        'gochi': ['"Gochi Hand"', 'cursive'],
+        sans: ['"Montserrat"', 'sans-serif'],
+        gochi: ['"Gochi Hand"', 'cursive'],
       },
     },
   },
