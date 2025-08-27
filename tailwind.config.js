@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"Montserrat"', 'sans-serif'],
+        sans: ['"League Spartan"', 'sans-serif'],
         gochi: ['"Gochi Hand"', 'cursive'],
       },
     },
