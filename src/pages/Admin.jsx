@@ -62,9 +62,7 @@ const Admin = () => {
     birthDate: '', // Changed from age to birthDate
     nationality: '',
     jerseyNumber: '',
-    height: '',
-    weight: '',
-    bio: '',
+    surname: '',
     profilePicture: '' // Added for profile picture URL
   });
 
@@ -144,8 +142,6 @@ const Admin = () => {
         ...playerForm,
         birthDate: playerForm.birthDate, // birthDate is already a string from input
         jerseyNumber: parseInt(playerForm.jerseyNumber) || 0,
-        height: playerForm.height,
-        weight: playerForm.weight,
         createdAt: editingItem ? editingItem.createdAt : new Date(),
         updatedAt: new Date(),
         profilePicture: playerForm.profilePicture || '', // Ensure profilePicture is saved
@@ -215,9 +211,7 @@ const Admin = () => {
       birthDate: '',
       nationality: '',
       jerseyNumber: '',
-      height: '',
-      weight: '',
-      bio: '',
+      surname: '',
       profilePicture: ''
     });
   };
@@ -444,7 +438,10 @@ const Admin = () => {
           {players.map((player) => (
             <div key={player.id} className="border rounded-lg p-4">
               <div className="flex justify-between items-start mb-2">
-                <h3 className="font-bold">{player.name}</h3>
+                <div>
+                  <h3 className="font-bold">{player.name}</h3>
+                  <p className="text-sm text-gray-600">{player.surname}</p>
+                </div>
                 <div className="flex gap-1">
                   <Button variant="ghost" size="sm" onClick={() => openModal('player', player)}>
                     <Edit size={14} />
@@ -675,26 +672,7 @@ const Admin = () => {
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Height</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. 180cm"
-                      value={playerForm.height}
-                      onChange={(e) => setPlayerForm({...playerForm, height: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Weight</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. 75kg"
-                      value={playerForm.weight}
-                      onChange={(e) => setPlayerForm({...playerForm, weight: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                    />
-                  </div>
+                  
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Nationality</label>
@@ -706,11 +684,11 @@ const Admin = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
-                  <textarea
-                    value={playerForm.bio}
-                    onChange={(e) => setPlayerForm({...playerForm, bio: e.target.value})}
-                    rows={3}
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Surname</label>
+                  <input
+                    type="text"
+                    value={playerForm.surname}
+                    onChange={(e) => setPlayerForm({...playerForm, surname: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
                   />
                 </div>

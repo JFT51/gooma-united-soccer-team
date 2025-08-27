@@ -49,9 +49,7 @@ const PlayerProfile = () => {
           birthDate: '', // Changed from age to birthDate
           nationality: '',
           jerseyNumber: '',
-          height: '',
-          weight: '',
-          bio: '',
+          surname: '',
           phone: '',
           address: '',
           emergencyContact: '',
@@ -317,34 +315,6 @@ const PlayerProfile = () => {
                   )}
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Height</label>
-                  {editing ? (
-                    <input
-                      type="text"
-                      placeholder="e.g. 180cm"
-                      value={formData.height || ''}
-                      onChange={(e) => handleInputChange('height', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                    />
-                  ) : (
-                    <p className="text-gray-900">{playerData?.height || 'Not specified'}</p>
-                  )}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Weight</label>
-                  {editing ? (
-                    <input
-                      type="text"
-                      placeholder="e.g. 75kg"
-                      value={formData.weight || ''}
-                      onChange={(e) => handleInputChange('weight', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                    />
-                  ) : (
-                    <p className="text-gray-900">{playerData?.weight || 'Not specified'}</p>
-                  )}
-                </div>
-                <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
                   {editing ? (
                     <input
@@ -359,17 +329,16 @@ const PlayerProfile = () => {
                 </div>
               </div>
               <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Surname</label>
                 {editing ? (
-                  <textarea
-                    value={formData.bio || ''}
-                    onChange={(e) => handleInputChange('bio', e.target.value)}
-                    rows={3}
+                  <input
+                    type="text"
+                    value={formData.surname || ''}
+                    onChange={(e) => handleInputChange('surname', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                    placeholder="Tell us about yourself..."
                   />
                 ) : (
-                  <p className="text-gray-900">{playerData?.bio || 'No bio available'}</p>
+                  <p className="text-gray-900">{playerData?.surname || 'Not specified'}</p>
                 )}
               </div>
             </div>

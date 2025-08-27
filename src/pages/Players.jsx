@@ -35,44 +35,44 @@ const Players = () => {
           {
             id: '1',
             name: 'Jean Dupont',
+            surname: 'Dupont',
             position: 'Goalkeeper',
             jerseyNumber: 1,
             age: 28,
             nationality: 'Belgian',
-            bio: 'Experienced goalkeeper with excellent reflexes and leadership skills.',
             stats: { matches: 45, cleanSheets: 18, saves: 156 },
             image: player1
           },
           {
             id: '2',
             name: 'Marc Janssen',
+            surname: 'Janssen',
             position: 'Defender',
             jerseyNumber: 4,
             age: 26,
             nationality: 'Belgian',
-            bio: 'Solid defender known for his aerial ability and tactical awareness.',
             stats: { matches: 42, goals: 3, assists: 7 },
             image: player2
           },
           {
             id: '3',
             name: 'Pierre Leroy',
+            surname: 'Leroy',
             position: 'Midfielder',
             jerseyNumber: 8,
             age: 24,
             nationality: 'Belgian',
-            bio: 'Creative midfielder with excellent passing range and vision.',
             stats: { matches: 38, goals: 8, assists: 12 },
             image: player3
           },
           {
             id: '4',
             name: 'Lucas Van Der Berg',
+            surname: 'Van Der Berg',
             position: 'Forward',
             jerseyNumber: 10,
             age: 22,
             nationality: 'Belgian',
-            bio: 'Talented striker with pace and clinical finishing ability.',
             stats: { matches: 40, goals: 18, assists: 6 },
             image: player4
           }
@@ -181,7 +181,8 @@ const Players = () => {
 
               {/* Player Info */}
               <div className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-2">{player.name}</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-1">{player.name}</h3>
+                <p className="text-md text-gray-600 mb-2">{player.surname}</p>
                 <div className="space-y-2 text-sm text-gray-600 mb-4">
                   <div className="flex items-center gap-2">
                     <Calendar size={16} />
@@ -327,10 +328,10 @@ const Players = () => {
                     </div>
                   </div>
 
-                  {/* Player Bio */}
+                  {/* Player Surname */}
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-3">About</h3>
-                    <p className="text-gray-600 leading-relaxed">{selectedPlayer.bio}</p>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3">Surname</h3>
+                    <p className="text-gray-600 leading-relaxed">{selectedPlayer.surname}</p>
                   </div>
                 </div>
               </div>
