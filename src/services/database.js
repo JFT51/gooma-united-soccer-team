@@ -107,6 +107,7 @@ export const getPlayers = async () => {
       return {
         id: doc.id,
         ...data,
+        dateOfBirth: data.dateOfBirth?.toDate ? data.dateOfBirth.toDate() : data.dateOfBirth, // Convert dateOfBirth to Date object
         createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : data.createdAt,
         updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : data.updatedAt,
       };
