@@ -5,22 +5,23 @@ import { getPlayers } from '../services/database.js';
 import { useTranslation } from 'react-i18next';
 
 // Function to calculate age from birth date
-const calculateAge = (dateOfBirth) => {
-  if (!dateOfBirth) return null;
+const calculateAge = (birthDate) => {
+  if (!birthDate) return null;
   
-  // Convert Firestore Timestamp to JavaScript Date if necessary
-  const birthDate = dateOfBirth.toDate ? dateOfBirth.toDate() : new Date(dateOfBirth);
+  // Parse the birth date from "YYYY-MM-DD" format
+  const [year, month, day] = birthDate.split('-').map(Number);
+  if (!year || !month || !day) return null;
   
   const today = new Date();
-  let age = today.getFullYear() - birthDate.getFullYear();
+  const birthDateTime = new Date(year, month - 1, day); // month is 0-based in JavaScript
+  
+  let age = today.getFullYear() - birthDateTime.getFullYear();
   
   // Check if birthday hasn't occurred this year
-  const birthMonth = birthDate.getMonth();
   const currentMonth = today.getMonth();
-  const birthDay = birthDate.getDate();
-  const currentDay = today.getDate();
+  const birthMonth = birthDateTime.getMonth();
   
-  if (currentMonth < birthMonth || (currentMonth === birthMonth && currentDay < birthDay)) {
+  if (currentMonth < birthMonth || (currentMonth === birthMonth && today.getDate() < birthDateTime.getDate())) {
     age--;
   }
   
@@ -39,11 +40,11 @@ const Players = () => {
     const fetchPlayers = async () => {
       setLoading(true);
       const playerData = await getPlayers();
-      const playersWithImagesAndAge = playerData.map((player) => ({
-        ...player,
-        image: player.profilePicture || `https://ui-avatars.com/api/?name=${player.name}&background=random`,
-        age: calculateAge(player.dateOfBirth) // Calculate age
-      }));
+        const playersWithImagesAndAge = playerData.map((player) => ({
+          ...player,
+          image: player.profilePicture || `https://ui-avatars.com/api/?name=${player.name}&background=random`,
+          age: calculateAge(player.birthDate) // Use birthDate instead of dateOfBirth
+        }));
       setPlayers(playersWithImagesAndAge);
       setFilteredPlayers(playersWithImagesAndAge);
       setLoading(false);
