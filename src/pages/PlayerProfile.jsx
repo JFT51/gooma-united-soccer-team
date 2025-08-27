@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import LoginForm from '../components/auth/LoginForm';
-import { getPlayerByEmail, updatePlayer, uploadProfilePicture } from '../services/database';
+import { getPlayerByEmail, updatePlayer } from '../services/database';
 
 const PlayerProfile = () => {
   const { currentUser, logout } = useAuth();
@@ -26,6 +26,14 @@ const PlayerProfile = () => {
   const [loading, setLoading] = useState(false);
   const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState({});
+
+  const playerImages = [
+    'player1.jpg',
+    'player2.jpg',
+    'player3.jpg',
+    'player4.jpg',
+    'player5.jpg',
+  ];
 
   useEffect(() => {
     if (currentUser) {
@@ -48,19 +56,8 @@ const PlayerProfile = () => {
     }
   };
 
-  const handleProfilePictureUpload = async (file) => {
-    if (!file) return;
-    setLoading(true);
-    try {
-      const downloadURL = await uploadProfilePicture(file, currentUser.uid);
-      setFormData(prev => ({ ...prev, profilePicture: downloadURL }));
-      alert('Profile picture uploaded successfully!');
-    } catch (error) {
-      console.error('Error uploading profile picture:', error);
-      alert(`Error uploading picture: ${error.message}`);
-    } finally {
-      setLoading(false);
-    }
+  const handleProfilePictureChange = (image) => {
+    setFormData(prev => ({ ...prev, profilePicture: `/src/assets/${image}` }));
   };
 
   const handleSave = async () => {
@@ -149,23 +146,22 @@ const PlayerProfile = () => {
               <div className="bg-gradient-to-r from-red-600 to-black p-6 text-white text-center">
                 <div className="relative inline-block">
                   <img 
-                    src={playerData?.profilePicture || `https://ui-avatars.com/api/?name=${playerData?.name}&background=random`} 
+                    src={formData.profilePicture || `https://ui-avatars.com/api/?name=${playerData?.name}&background=random`} 
                     alt={playerData?.name}
                     className="w-24 h-24 rounded-full object-cover mx-auto mb-4"
                   />
                   {editing && (
-                  <>
-                    <input
-                        type="file"
-                        id="profilePictureInput"
-                        accept="image/*"
-                        style={{ display: 'none' }}
-                        onChange={(e) => handleProfilePictureUpload(e.target.files[0])}
-                    />
-                    <label htmlFor="profilePictureInput" className="absolute bottom-0 right-0 bg-red-600 rounded-full p-2 hover:bg-red-700 cursor-pointer">
-                        <Camera size={16} className="text-white" />
-                    </label>
-                  </>
+                    <div className="grid grid-cols-3 gap-2 mt-4">
+                      {playerImages.map((image) => (
+                        <img
+                          key={image}
+                          src={`/src/assets/${image}`}
+                          alt={image}
+                          className={`w-16 h-16 object-cover rounded-full cursor-pointer ${formData.profilePicture === `/src/assets/${image}` ? 'border-4 border-red-500' : ''}`}
+                          onClick={() => handleProfilePictureChange(image)}
+                        />
+                      ))}
+                    </div>
                   )}
                 </div>
                 <h2 className="text-xl font-bold">{playerData?.name}</h2>

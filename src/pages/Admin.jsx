@@ -30,7 +30,6 @@ import {
   deleteMatch,
   deletePlayer,
   deleteNewsPost,
-  uploadProfilePicture // Import uploadProfilePicture
 } from '../services/database';
 
 const Admin = () => {
@@ -43,6 +42,14 @@ const Admin = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState('');
   const [editingItem, setEditingItem] = useState(null);
+
+  const playerImages = [
+    'player1.jpg',
+    'player2.jpg',
+    'player3.jpg',
+    'player4.jpg',
+    'player5.jpg',
+  ];
 
   // Form states
   const [matchForm, setMatchForm] = useState({
@@ -93,21 +100,6 @@ const Admin = () => {
       setNews(newsData);
     } catch (error) {
       console.error('Error fetching data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleProfilePictureUpload = async (file) => {
-    if (!file) return;
-    setLoading(true);
-    try {
-      const downloadURL = await uploadProfilePicture(file, editingItem?.userId || currentUser.uid); // Use current user's ID or editing item's ID
-      setPlayerForm(prev => ({ ...prev, profilePicture: downloadURL }));
-      alert('Profile picture uploaded successfully!');
-    } catch (error) {
-      console.error('Error uploading profile picture:', error);
-      alert(`Error uploading picture: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -704,12 +696,17 @@ const Admin = () => {
                 {/* Profile Picture Upload */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Profile Picture</label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleProfilePictureUpload(e.target.files[0])}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                  />
+                  <div className="grid grid-cols-3 gap-4">
+                    {playerImages.map((image) => (
+                        <img
+                            key={image}
+                            src={`/src/assets/${image}`}
+                            alt={image}
+                            className={`w-24 h-24 object-cover rounded-full cursor-pointer ${playerForm.profilePicture === `/src/assets/${image}` ? 'border-4 border-red-500' : ''}`}
+                            onClick={() => setPlayerForm({ ...playerForm, profilePicture: `/src/assets/${image}` })}
+                        />
+                    ))}
+                  </div>
                   {playerForm.profilePicture && (
                     <img src={playerForm.profilePicture} alt="Profile" className="mt-2 h-20 w-20 object-cover rounded-full" />
                   )}
