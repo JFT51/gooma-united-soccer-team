@@ -30,6 +30,11 @@ import {
   deleteMatch,
   deletePlayer,
   deleteNewsPost,
+  getMatches as getAllMatches,
+  getTeamByName,
+  addTeam,
+  getTeams,
+  updateTeam,
 } from '../services/database';
 
 const Admin = () => {
@@ -39,6 +44,7 @@ const Admin = () => {
   const [matches, setMatches] = useState([]);
   const [players, setPlayers] = useState([]);
   const [news, setNews] = useState([]);
+  const [teams, setTeams] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState('');
   const [editingItem, setEditingItem] = useState(null);
@@ -90,16 +96,47 @@ const Admin = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [matchesData, playersData, newsData] = await Promise.all([
+      const [matchesData, playersData, newsData, teamsData] = await Promise.all([
         getMatches(),
         getPlayers(),
-        getNewsPosts()
+        getNewsPosts(),
+        getTeams()
       ]);
       setMatches(matchesData);
       setPlayers(playersData);
       setNews(newsData);
+      setTeams(teamsData);
     } catch (error) {
       console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePopulateTeams = async () => {
+    setLoading(true);
+    try {
+      const matches = await getAllMatches();
+      const teamNames = new Set(matches.map(match => match.opponent));
+      teamNames.add("Gooma United");
+
+      let newTeamsCount = 0;
+      for (const name of teamNames) {
+        const existingTeam = await getTeamByName(name);
+        if (!existingTeam) {
+          await addTeam({
+            name: name,
+            home_address: "",
+            club_color1: "#000000",
+            club_color2: "#FFFFFF",
+          });
+          newTeamsCount++;
+        }
+      }
+      alert(`${newTeamsCount} new teams have been populated. Please refresh if you don't see them in the Teams tab.`);
+    } catch (error) {
+      console.error('Error populating teams:', error);
+      alert('An error occurred while populating teams.');
     } finally {
       setLoading(false);
     }
@@ -310,8 +347,90 @@ const Admin = () => {
           <FileText className="text-purple-600" size={32} />
         </div>
       </div>
+      <div className="bg-white rounded-lg shadow-lg p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-gray-600">Team Management</p>
+            <Button onClick={handlePopulateTeams} className="mt-2 bg-blue-600 hover:bg-blue-700">
+                Populate Teams from Calendar
+            </Button>
+          </div>
+          <Users className="text-orange-600" size={32} />
+        </div>
+      </div>
     </div>
   );
+
+  const renderTeams = () => {
+    const handleTeamUpdate = (id, field, value) => {
+      setTeams(teams.map(team => team.id === id ? { ...team, [field]: value } : team));
+    };
+
+    const handleSaveTeam = async (team) => {
+      try {
+        await updateTeam(team.id, {
+          home_address: team.home_address,
+          club_color1: team.club_color1,
+          club_color2: team.club_color2,
+        });
+        alert('Team updated successfully!');
+      } catch (error) {
+        console.error('Error updating team:', error);
+        alert('Error updating team.');
+      }
+    };
+
+    return (
+      <div className="bg-white rounded-lg shadow-lg">
+        <div className="p-6 border-b border-gray-200">
+          <h2 className="text-xl font-bold text-gray-900">Manage Teams</h2>
+        </div>
+        <div className="p-6">
+          <div className="space-y-4">
+            {teams.map((team) => (
+              <div key={team.id} className="border rounded-lg p-4">
+                <h3 className="font-bold mb-2">{team.name}</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Home Address</label>
+                    <input
+                      type="text"
+                      value={team.home_address || ''}
+                      onChange={(e) => handleTeamUpdate(team.id, 'home_address', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Club Color 1</label>
+                    <input
+                      type="color"
+                      value={team.club_color1 || '#000000'}
+                      onChange={(e) => handleTeamUpdate(team.id, 'club_color1', e.target.value)}
+                      className="w-full h-10 px-1 py-1 border border-gray-300 rounded-md"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Club Color 2</label>
+                    <input
+                      type="color"
+                      value={team.club_color2 || '#FFFFFF'}
+                      onChange={(e) => handleTeamUpdate(team.id, 'club_color2', e.target.value)}
+                      className="w-full h-10 px-1 py-1 border border-gray-300 rounded-md"
+                    />
+                  </div>
+                </div>
+                <div className="flex justify-end mt-4">
+                  <Button onClick={() => handleSaveTeam(team)} className="bg-red-600 hover:bg-red-700">
+                    Save
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   const renderMatches = () => (
     <div className="bg-white rounded-lg shadow-lg">
@@ -816,7 +935,8 @@ const Admin = () => {
               { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
               { id: 'matches', label: 'Matches', icon: Calendar },
               { id: 'players', label: 'Players', icon: Users },
-              { id: 'news', label: 'News', icon: FileText }
+              { id: 'news', label: 'News', icon: FileText },
+              { id: 'teams', label: 'Teams', icon: Users }
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -847,6 +967,7 @@ const Admin = () => {
             {activeTab === 'matches' && renderMatches()}
             {activeTab === 'players' && renderPlayers()}
             {activeTab === 'news' && renderNews()}
+            {activeTab === 'teams' && renderTeams()}
           </>
         )}
       </div>

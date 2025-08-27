@@ -1,15 +1,15 @@
-import { 
-  collection, 
-  doc, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
-  getDocs, 
-  getDoc, 
-  query, 
-  orderBy, 
+import {
+  collection,
+  doc,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  getDocs,
+  getDoc,
+  query,
+  orderBy,
   where,
-  limit 
+  limit
 } from 'firebase/firestore';
 import { db, storage } from '../lib/firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -28,6 +28,7 @@ export const addMatch = async (matchData) => {
     throw error;
   }
 };
+
 
 export const uploadProfilePicture = async (file, userId) => {
   try {
@@ -174,7 +175,8 @@ export const updatePlayer = async (playerId, playerData) => {
 export const deletePlayer = async (playerId) => {
   try {
     await deleteDoc(doc(db, 'players', playerId));
-  } catch (error) {
+  } catch (error)
+{
     console.error('Error deleting player:', error);
     throw error;
   }
@@ -198,7 +200,7 @@ export const addNewsPost = async (postData) => {
 export const getNewsPosts = async (limitCount = 10) => {
   try {
     const q = query(
-      collection(db, 'news'), 
+      collection(db, 'news'),
       orderBy('createdAt', 'desc'),
       limit(limitCount)
     );
@@ -311,6 +313,70 @@ export const deleteVenue = async (venueId) => {
     await deleteDoc(doc(db, 'venues', venueId));
   } catch (error) {
     console.error('Error deleting venue:', error);
+    throw error;
+  }
+};
+
+// Teams
+export const getTeamByName = async (name) => {
+  try {
+    const q = query(collection(db, 'teams'), where('name', '==', name));
+    const querySnapshot = await getDocs(q);
+    if (!querySnapshot.empty) {
+      const doc = querySnapshot.docs[0];
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+      };
+    }
+    return null;
+  } catch (error) {
+    console.error('Error getting team by name:', error);
+    throw error;
+  }
+};
+
+export const getTeams = async () => {
+  try {
+    const q = query(collection(db, 'teams'), orderBy('name', 'asc'));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+      };
+    });
+  } catch (error) {
+    console.error('Error getting teams:', error);
+    throw error;
+  }
+};
+
+export const addTeam = async (teamData) => {
+  try {
+    const docRef = await addDoc(collection(db, 'teams'), {
+      ...teamData,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+    return docRef.id;
+  } catch (error) {
+    console.error('Error adding team:', error);
+    throw error;
+  }
+};
+
+export const updateTeam = async (teamId, teamData) => {
+  try {
+    const teamRef = doc(db, 'teams', teamId);
+    await updateDoc(teamRef, {
+      ...teamData,
+      updatedAt: new Date()
+    });
+  } catch (error) {
+    console.error('Error updating team:', error);
     throw error;
   }
 };
