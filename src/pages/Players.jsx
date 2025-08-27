@@ -7,13 +7,23 @@ import { useTranslation } from 'react-i18next';
 // Function to calculate age from birth date
 const calculateAge = (dateOfBirth) => {
   if (!dateOfBirth) return null;
-  const birthDate = new Date(dateOfBirth);
+  
+  // Convert Firestore Timestamp to JavaScript Date if necessary
+  const birthDate = dateOfBirth.toDate ? dateOfBirth.toDate() : new Date(dateOfBirth);
+  
   const today = new Date();
   let age = today.getFullYear() - birthDate.getFullYear();
-  const monthDifference = today.getMonth() - birthDate.getMonth();
-  if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+  
+  // Check if birthday hasn't occurred this year
+  const birthMonth = birthDate.getMonth();
+  const currentMonth = today.getMonth();
+  const birthDay = birthDate.getDate();
+  const currentDay = today.getDate();
+  
+  if (currentMonth < birthMonth || (currentMonth === birthMonth && currentDay < birthDay)) {
     age--;
   }
+  
   return age;
 };
 
