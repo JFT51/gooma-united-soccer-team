@@ -73,7 +73,7 @@ const Home = () => {
               GOOMA
               <span className="block text-red-400" style={{textShadow: '3px 3px 6px rgba(0,0,0,0.9)'}}>UNITED</span>
             </h1>
-            <p className="text-xl md:text-2xl mb-8 text-gray-100 max-w-2xl mx-auto" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.8)'}}>
+            <p className="text-xl md:text-2xl mb-8 text-gray-100 max-w-2xl mx-auto font-gochi" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.8)'}}>
               {t('home.hero.subtitle')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -116,24 +116,24 @@ const Home = () => {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Club Statistics</h2>
-            <p className="text-red-100 text-lg">Our journey and achievements over the years</p>
+            <p className="text-2xl font-gochi">When Gooma is United, they will never be divided</p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div className="bg-white bg-opacity-10 rounded-xl p-6 backdrop-blur-sm transform hover:scale-105 transition-all duration-300 hover:bg-opacity-20">
-              <div className="text-4xl md:text-5xl font-bold mb-3 text-white">15</div>
-              <div className="text-red-100 font-medium">{t('home.stats.yearsExcellence')}</div>
+              <div className="text-4xl md:text-5xl font-bold mb-3 text-black">15</div>
+              <div className="text-red-800 font-medium">{t('home.stats.yearsExcellence')}</div>
             </div>
             <div className="bg-white bg-opacity-10 rounded-xl p-6 backdrop-blur-sm transform hover:scale-105 transition-all duration-300 hover:bg-opacity-20">
-              <div className="text-4xl md:text-5xl font-bold mb-3 text-white">3</div>
-              <div className="text-red-100 font-medium">{t('home.stats.leagueTitles')}</div>
+              <div className="text-4xl md:text-5xl font-bold mb-3 text-black">3</div>
+              <div className="text-red-800 font-medium">{t('home.stats.leagueTitles')}</div>
             </div>
             <div className="bg-white bg-opacity-10 rounded-xl p-6 backdrop-blur-sm transform hover:scale-105 transition-all duration-300 hover:bg-opacity-20">
-              <div className="text-4xl md:text-5xl font-bold mb-3 text-white">25</div>
-              <div className="text-red-100 font-medium">{t('home.stats.squadPlayers')}</div>
+              <div className="text-4xl md:text-5xl font-bold mb-3 text-black">25</div>
+              <div className="text-red-800 font-medium">{t('home.stats.squadPlayers')}</div>
             </div>
             <div className="bg-white bg-opacity-10 rounded-xl p-6 backdrop-blur-sm transform hover:scale-105 transition-all duration-300 hover:bg-opacity-20">
-              <div className="text-4xl md:text-5xl font-bold mb-3 text-white">10K</div>
-              <div className="text-red-100 font-medium">{t('home.stats.loyalFans')}</div>
+              <div className="text-4xl md:text-5xl font-bold mb-3 text-black">10K</div>
+              <div className="text-red-800 font-medium">{t('home.stats.loyalFans')}</div>
             </div>
           </div>
         </div>
