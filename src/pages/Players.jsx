@@ -5,26 +5,15 @@ import { getPlayers } from '../services/database.js';
 import { useTranslation } from 'react-i18next';
 
 // Function to calculate age from birth date
-const calculateAge = (birthDate) => {
-  if (!birthDate) return null;
-  
-  // Parse the birth date from "YYYY-MM-DD" format
-  const [year, month, day] = birthDate.split('-').map(Number);
-  if (!year || !month || !day) return null;
-  
+const calculateAge = (dateOfBirth) => {
+  if (!dateOfBirth) return null;
+  const birthDate = new Date(dateOfBirth);
   const today = new Date();
-  const birthDateTime = new Date(year, month - 1, day); // month is 0-based in JavaScript
-  
-  let age = today.getFullYear() - birthDateTime.getFullYear();
-  
-  // Check if birthday hasn't occurred this year
-  const currentMonth = today.getMonth();
-  const birthMonth = birthDateTime.getMonth();
-  
-  if (currentMonth < birthMonth || (currentMonth === birthMonth && today.getDate() < birthDateTime.getDate())) {
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDifference = today.getMonth() - birthDate.getMonth();
+  if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
     age--;
   }
-  
   return age;
 };
 
@@ -40,11 +29,11 @@ const Players = () => {
     const fetchPlayers = async () => {
       setLoading(true);
       const playerData = await getPlayers();
-        const playersWithImagesAndAge = playerData.map((player) => ({
-          ...player,
-          image: player.profilePicture || `https://ui-avatars.com/api/?name=${player.name}&background=random`,
-          age: calculateAge(player.birthDate) // Use birthDate instead of dateOfBirth
-        }));
+      const playersWithImagesAndAge = playerData.map((player) => ({
+        ...player,
+        image: player.profilePicture || `https://ui-avatars.com/api/?name=${player.name}&background=random`,
+        age: calculateAge(player.dateOfBirth) // Calculate age
+      }));
       setPlayers(playersWithImagesAndAge);
       setFilteredPlayers(playersWithImagesAndAge);
       setLoading(false);
@@ -151,8 +140,7 @@ const Players = () => {
                 <p className="text-md text-gray-600 mb-2">{player.surname}</p>
                 <div className="space-y-2 text-sm text-gray-600 mb-4">
                   <div className="flex items-center gap-2">
-                    <Calendar size={16} />
-                    <span>{player.age ? `${player.age} ${t('players.years')}` : t('players.ageNotAvailable')}</span>
+                    <span>{t('players.ageDisplay', { age: player.age })}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <MapPin size={16} />
@@ -242,12 +230,10 @@ const Players = () => {
                       <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('players.playerInfo')}</h3>
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
-                          <span className="text-gray-600">{t('players.age')}:</span>
-                          <span className="font-medium">{selectedPlayer.age ? `${selectedPlayer.age} ${t('players.years')}` : t('players.ageNotAvailable')}</span>
+                          <span className="text-gray-600">{t('players.ageDisplay', { age: selectedPlayer.age })}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-600">{t('players.nationality')}:</span>
-                          <span className="font-medium">{selectedPlayer.nationality}</span>
+                          <span className="text-gray-600">{t('players.ageDisplay', { age: selectedPlayer.age })}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">{t('players.position')}:</span>
