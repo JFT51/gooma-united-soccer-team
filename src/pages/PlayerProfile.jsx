@@ -20,6 +20,18 @@ import { Button } from '@/components/ui/button';
 import LoginForm from '../components/auth/LoginForm';
 import { getPlayerByEmail, updatePlayer } from '../services/database';
 
+const calculateAge = (birthDate) => {
+  if (!birthDate) return 'N/A';
+  const today = new Date();
+  const birthDateObj = new Date(birthDate);
+  let age = today.getFullYear() - birthDateObj.getFullYear();
+  const m = today.getMonth() - birthDateObj.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birthDateObj.getDate())) {
+    age--;
+  }
+  return age;
+};
+
 const PlayerProfile = () => {
   const { currentUser, logout } = useAuth();
   const [playerData, setPlayerData] = useState(null);
@@ -278,7 +290,7 @@ const PlayerProfile = () => {
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
                     />
                   ) : (
-                    <p className="text-gray-900">{playerData?.birthDate ? new Date(playerData.birthDate).toLocaleDateString() : 'Not specified'}</p>
+                    <p className="text-gray-900">{playerData?.birthDate ? `${calculateAge(playerData.birthDate)} years old` : 'Not specified'}</p>
                   )}
                 </div>
                 <div>

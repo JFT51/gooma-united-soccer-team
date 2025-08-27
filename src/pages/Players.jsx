@@ -3,6 +3,18 @@ import { User, MapPin, Calendar, Trophy, Target, Users, Filter } from 'lucide-re
 import { Button } from '@/components/ui/button';
 import { getPlayers } from '../services/database.js';
 
+const calculateAge = (birthDate) => {
+  if (!birthDate) return 'N/A';
+  const today = new Date();
+  const birthDateObj = new Date(birthDate);
+  let age = today.getFullYear() - birthDateObj.getFullYear();
+  const m = today.getMonth() - birthDateObj.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birthDateObj.getDate())) {
+    age--;
+  }
+  return age;
+};
+
 const Players = () => {
   const [players, setPlayers] = useState([]);
   const [filteredPlayers, setFilteredPlayers] = useState([]);
@@ -126,7 +138,7 @@ const Players = () => {
                 <div className="space-y-2 text-sm text-gray-600 mb-4">
                   <div className="flex items-center gap-2">
                     <Calendar size={16} />
-                    <span>{player.age} years old</span>
+                    <span>{calculateAge(player.birthDate)} years old</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <MapPin size={16} />
@@ -217,7 +229,7 @@ const Players = () => {
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
                           <span className="text-gray-600">Age:</span>
-                          <span className="font-medium">{selectedPlayer.age} years</span>
+                          <span className="font-medium">{calculateAge(selectedPlayer.birthDate)} years</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Nationality:</span>
