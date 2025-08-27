@@ -32,7 +32,6 @@ const Navigation = () => {
           <div className="flex items-center relative">
             <Link to="/" className="flex-shrink-0 flex items-center">
               <img src={logo} alt="Gooma United Logo" className="absolute left-0 bottom-0 transform translate-y-1/2 h-24 w-24" />
-              <span className="text-2xl font-bold pl-28">Gooma United</span>
             </Link>
           </div>
 
