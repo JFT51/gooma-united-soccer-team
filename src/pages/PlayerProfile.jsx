@@ -40,35 +40,6 @@ const PlayerProfile = () => {
       if (player) {
         setPlayerData(player);
         setFormData(player);
-      } else {
-        // Create default player profile if not found
-        const defaultPlayer = {
-          name: currentUser.displayName || 'Player Name',
-          email: currentUser.email,
-          position: '',
-          birthDate: '', // Changed from age to birthDate
-          nationality: '',
-          jerseyNumber: '',
-          surname: '',
-          phone: '',
-          address: '',
-          emergencyContact: '',
-          medicalInfo: '',
-          goals: 0,
-          assists: 0,
-          matches: 0,
-          yellowCards: 0,
-          redCards: 0,
-          achievements: [],
-          socialMedia: {
-            instagram: '',
-            twitter: '',
-            facebook: ''
-          },
-          profilePicture: '' // Added for profile picture URL
-        };
-        setPlayerData(defaultPlayer);
-        setFormData(defaultPlayer);
       }
     } catch (error) {
       console.error('Error fetching player data:', error);

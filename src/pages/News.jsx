@@ -14,70 +14,11 @@ const News = () => {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      try {
-        const newsData = await getNewsPosts();
-        setPosts(newsData);
-        setFilteredPosts(newsData);
-      } catch (error) {
-        console.error('Error fetching news:', error);
-        // Use sample data if Firebase fails
-        const samplePosts = [
-          {
-            id: '1',
-            title: 'Gooma United Wins Championship Final',
-            content: 'In a thrilling match that went into extra time, Gooma United secured their third league title with a spectacular 3-2 victory over their rivals. The team showed incredible determination and skill throughout the match.',
-            author: 'Sports Reporter',
-            createdAt: { seconds: Date.now() / 1000 - 86400 }, // 1 day ago
-            category: 'Match Results',
-            tags: ['championship', 'victory', 'final'],
-            featured: true
-          },
-          {
-            id: '2',
-            title: 'New Signing: Lucas Van Der Berg Joins the Squad',
-            content: 'We are excited to announce the signing of talented striker Lucas Van Der Berg. The 22-year-old Belgian forward brings pace, skill, and a proven goal-scoring record to our team.',
-            author: 'Team Manager',
-            createdAt: { seconds: Date.now() / 1000 - 172800 }, // 2 days ago
-            category: 'Transfers',
-            tags: ['signing', 'striker', 'transfer'],
-            featured: false
-          },
-          {
-            id: '3',
-            title: 'Training Camp Preparations Begin',
-            content: 'The team has started intensive training preparations for the upcoming season. Coach emphasizes fitness, tactical awareness, and team chemistry as key focus areas.',
-            author: 'Team Coach',
-            createdAt: { seconds: Date.now() / 1000 - 259200 }, // 3 days ago
-            category: 'Training',
-            tags: ['training', 'preparation', 'season'],
-            featured: false
-          },
-          {
-            id: '4',
-            title: 'Community Outreach Program Launch',
-            content: 'Gooma United is proud to launch our community outreach program, focusing on youth development and promoting football in local schools. We believe in giving back to our community.',
-            author: 'Community Manager',
-            createdAt: { seconds: Date.now() / 1000 - 345600 }, // 4 days ago
-            category: 'Community',
-            tags: ['community', 'youth', 'outreach'],
-            featured: false
-          },
-          {
-            id: '5',
-            title: 'Season Ticket Sales Now Open',
-            content: 'Season tickets for the 2025-26 season are now available for purchase. Early bird discounts are available for the first 500 supporters. Join us for another exciting season!',
-            author: 'Ticket Office',
-            createdAt: { seconds: Date.now() / 1000 - 432000 }, // 5 days ago
-            category: 'Tickets',
-            tags: ['tickets', 'season', 'supporters'],
-            featured: false
-          }
-        ];
-        setPosts(samplePosts);
-        setFilteredPosts(samplePosts);
-      } finally {
-        setLoading(false);
-      }
+      setLoading(true);
+      const newsData = await getNewsPosts();
+      setPosts(newsData);
+      setFilteredPosts(newsData);
+      setLoading(false);
     };
 
     fetchPosts();
@@ -410,4 +351,3 @@ const News = () => {
 };
 
 export default News;
-

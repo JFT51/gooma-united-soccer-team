@@ -19,69 +19,16 @@ const Players = () => {
 
   useEffect(() => {
     const fetchPlayers = async () => {
-      try {
-        const playerData = await getPlayers();
-        // Add placeholder images to players
-        const playersWithImages = playerData.map((player, index) => ({
-          ...player,
-          image: playerImages[index % playerImages.length]
-        }));
-        setPlayers(playersWithImages);
-        setFilteredPlayers(playersWithImages);
-      } catch (error) {
-        console.error('Error fetching players:', error);
-        // Use sample data if Firebase fails
-        const samplePlayers = [
-          {
-            id: '1',
-            name: 'Jean Dupont',
-            surname: 'Dupont',
-            position: 'Goalkeeper',
-            jerseyNumber: 1,
-            age: 28,
-            nationality: 'Belgian',
-            stats: { matches: 45, cleanSheets: 18, saves: 156 },
-            image: player1
-          },
-          {
-            id: '2',
-            name: 'Marc Janssen',
-            surname: 'Janssen',
-            position: 'Defender',
-            jerseyNumber: 4,
-            age: 26,
-            nationality: 'Belgian',
-            stats: { matches: 42, goals: 3, assists: 7 },
-            image: player2
-          },
-          {
-            id: '3',
-            name: 'Pierre Leroy',
-            surname: 'Leroy',
-            position: 'Midfielder',
-            jerseyNumber: 8,
-            age: 24,
-            nationality: 'Belgian',
-            stats: { matches: 38, goals: 8, assists: 12 },
-            image: player3
-          },
-          {
-            id: '4',
-            name: 'Lucas Van Der Berg',
-            surname: 'Van Der Berg',
-            position: 'Forward',
-            jerseyNumber: 10,
-            age: 22,
-            nationality: 'Belgian',
-            stats: { matches: 40, goals: 18, assists: 6 },
-            image: player4
-          }
-        ];
-        setPlayers(samplePlayers);
-        setFilteredPlayers(samplePlayers);
-      } finally {
-        setLoading(false);
-      }
+      setLoading(true);
+      const playerData = await getPlayers();
+      // Add placeholder images to players
+      const playersWithImages = playerData.map((player, index) => ({
+        ...player,
+        image: playerImages[index % playerImages.length]
+      }));
+      setPlayers(playersWithImages);
+      setFilteredPlayers(playersWithImages);
+      setLoading(false);
     };
 
     fetchPlayers();
