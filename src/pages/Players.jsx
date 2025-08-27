@@ -150,7 +150,8 @@ const Players = () => {
                 <p className="text-md text-gray-600 mb-2">{player.surname}</p>
                 <div className="space-y-2 text-sm text-gray-600 mb-4">
                   <div className="flex items-center gap-2">
-                    <span>{player.age ? t('players.ageDisplay', { age: player.age }) : t('players.ageNotAvailable')}</span>
+                    <Calendar size={16} />
+                    <span>{player.age ? `${player.age} ${t('players.years')}` : t('players.ageNotAvailable')}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <MapPin size={16} />
@@ -241,7 +242,7 @@ const Players = () => {
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
                           <span className="text-gray-600">{t('players.age')}:</span>
-                          <span className="font-medium">{selectedPlayer.age ? t('players.ageDisplay', { age: selectedPlayer.age }) : t('players.ageNotAvailable')}</span>
+                          <span className="font-medium">{selectedPlayer.age ? `${selectedPlayer.age} ${t('players.years')}` : t('players.ageNotAvailable')}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">{t('players.nationality')}:</span>
