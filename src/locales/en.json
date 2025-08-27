@@ -89,6 +89,7 @@
       "forward": "Forward"
     },
     "ageDisplay": "Age: {{age}} years old",
+    "years": "years",
     "ageNotAvailable": "Age not available",
     "matches": "Matches",
     "cleanSheets": "Clean Sheets",
@@ -97,6 +98,7 @@
     "assists": "Assists",
     "noPlayersFilter": "No players found matching the selected position filter.",
     "playerInfo": "Player Info",
+    "age": "Age",
     "seasonStats": "Season Stats",
     "matchesPlayed": "Matches Played",
     "surname": "Surname"
