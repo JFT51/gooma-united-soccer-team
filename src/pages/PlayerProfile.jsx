@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import LoginForm from '../components/auth/LoginForm';
-import { getPlayerByEmail, updatePlayer } from '../services/database';
+import { getPlayerByEmail, updatePlayer, uploadProfilePicture } from '../services/database';
 
 const PlayerProfile = () => {
   const { currentUser, logout } = useAuth();
@@ -43,6 +43,21 @@ const PlayerProfile = () => {
       }
     } catch (error) {
       console.error('Error fetching player data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleProfilePictureUpload = async (file) => {
+    if (!file) return;
+    setLoading(true);
+    try {
+      const downloadURL = await uploadProfilePicture(file, currentUser.uid);
+      setFormData(prev => ({ ...prev, profilePicture: downloadURL }));
+      alert('Profile picture uploaded successfully!');
+    } catch (error) {
+      console.error('Error uploading profile picture:', error);
+      alert(`Error uploading picture: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -133,13 +148,24 @@ const PlayerProfile = () => {
               {/* Profile Header */}
               <div className="bg-gradient-to-r from-red-600 to-black p-6 text-white text-center">
                 <div className="relative inline-block">
-                  <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
-                    <User size={48} className="text-gray-400" />
-                  </div>
+                  <img 
+                    src={playerData?.profilePicture || `https://ui-avatars.com/api/?name=${playerData?.name}&background=random`} 
+                    alt={playerData?.name}
+                    className="w-24 h-24 rounded-full object-cover mx-auto mb-4"
+                  />
                   {editing && (
-                    <button className="absolute bottom-0 right-0 bg-red-600 rounded-full p-2 hover:bg-red-700">
-                      <Camera size={16} className="text-white" />
-                    </button>
+                  <>
+                    <input
+                        type="file"
+                        id="profilePictureInput"
+                        accept="image/*"
+                        style={{ display: 'none' }}
+                        onChange={(e) => handleProfilePictureUpload(e.target.files[0])}
+                    />
+                    <label htmlFor="profilePictureInput" className="absolute bottom-0 right-0 bg-red-600 rounded-full p-2 hover:bg-red-700 cursor-pointer">
+                        <Camera size={16} className="text-white" />
+                    </label>
+                  </>
                   )}
                 </div>
                 <h2 className="text-xl font-bold">{playerData?.name}</h2>

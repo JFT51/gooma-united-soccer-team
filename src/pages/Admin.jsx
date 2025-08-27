@@ -437,10 +437,22 @@ const Admin = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {players.map((player) => (
             <div key={player.id} className="border rounded-lg p-4">
-              <div className="flex justify-between items-start mb-2">
+              <div className="flex items-center mb-4">
+                <img 
+                  src={player.profilePicture || `https://ui-avatars.com/api/?name=${player.name}&background=random`} 
+                  alt={player.name}
+                  className="w-16 h-16 rounded-full object-cover mr-4"
+                />
                 <div>
                   <h3 className="font-bold">{player.name}</h3>
                   <p className="text-sm text-gray-600">{player.surname}</p>
+                </div>
+              </div>
+              <div className="flex justify-between items-start mb-2">
+                <div>
+                  <p className="text-sm text-gray-600">{player.position}</p>
+                  <p className="text-sm text-gray-600">#{player.jerseyNumber}</p>
+                  <p className="text-sm text-gray-600">{player.nationality}</p>
                 </div>
                 <div className="flex gap-1">
                   <Button variant="ghost" size="sm" onClick={() => openModal('player', player)}>
@@ -466,9 +478,6 @@ const Admin = () => {
                   </Button>
                 </div>
               </div>
-              <p className="text-sm text-gray-600">{player.position}</p>
-              <p className="text-sm text-gray-600">#{player.jerseyNumber}</p>
-              <p className="text-sm text-gray-600">{player.nationality}</p>
             </div>
           ))}
         </div>
