@@ -13,11 +13,18 @@ import {
 } from 'firebase/firestore';
 import { db, storage } from '../lib/firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { auth } from '../lib/firebase';
 
 // Matches
 export const addMatch = async (matchData) => {
   try {
+    // Check if user is authenticated
+    if (!auth.currentUser) {
+      throw new Error('User must be authenticated to add matches');
+    }
+    
     console.log('Adding match to Firestore:', matchData);
+    console.log('Current user:', auth.currentUser?.email);
     const docRef = await addDoc(collection(db, 'matches'), {
       ...matchData,
       // Ensure date is properly formatted
@@ -98,6 +105,13 @@ export const deleteMatch = async (matchId) => {
 // Players
 export const addPlayer = async (playerData) => {
   try {
+    // Check if user is authenticated
+    if (!auth.currentUser) {
+      throw new Error('User must be authenticated to add players');
+    }
+    
+    console.log('Adding player to Firestore:', playerData);
+    console.log('Current user:', auth.currentUser?.email);
     const docRef = await addDoc(collection(db, 'players'), {
       ...playerData,
       createdAt: new Date(),
@@ -199,6 +213,13 @@ export const deletePlayer = async (playerId) => {
 // News/Blog Posts
 export const addNewsPost = async (postData) => {
   try {
+    // Check if user is authenticated
+    if (!auth.currentUser) {
+      throw new Error('User must be authenticated to add news posts');
+    }
+    
+    console.log('Adding news post to Firestore:', postData);
+    console.log('Current user:', auth.currentUser?.email);
     const docRef = await addDoc(collection(db, 'news'), {
       ...postData,
       createdAt: new Date(),

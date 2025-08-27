@@ -35,6 +35,7 @@ import {
   getTeams,
   updateTeam,
 } from '../services/database';
+import { auth } from '../lib/firebase';
 
 const Admin = () => {
   const { currentUser, logout } = useAuth();
@@ -90,7 +91,10 @@ const Admin = () => {
     console.log('Admin component mounted. currentUser:', currentUser);
     if (currentUser) {
       console.log('currentUser exists, calling fetchData...');
-      fetchData();
+      // Add a small delay to ensure auth state is fully established
+      setTimeout(() => {
+        fetchData();
+      }, 1000);
     } else {
       console.log('currentUser does not exist.');
     }
@@ -98,6 +102,8 @@ const Admin = () => {
 
   const fetchData = async () => {
     console.log('fetchData called');
+    console.log('Current user in fetchData:', currentUser?.email);
+    console.log('Auth current user:', auth.currentUser?.email);
     setLoading(true);
     try {
       console.log('Fetching data from Firestore...');
@@ -114,8 +120,18 @@ const Admin = () => {
       setTeams(teamsData);
     } catch (error) {
       console.error('Error in fetchData:', error);
+      console.error('Error details:', {
+        code: error.code,
+        message: error.message,
+        currentUser: currentUser?.email,
+        authCurrentUser: auth.currentUser?.email
+      });
       // Show user-friendly error message
-      alert(`Database connection error: ${error.message}. Please check your internet connection and try again.`);
+      if (error.code === 'permission-denied') {
+        alert('Permission denied. Please make sure you are logged in as an admin and the Firestore rules are properly configured.');
+      } else {
+        alert(`Database connection error: ${error.message}. Please check your internet connection and try again.`);
+      }
     } finally {
       console.log('fetchData finished');
       setLoading(false);
