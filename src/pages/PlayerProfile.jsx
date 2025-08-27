@@ -57,7 +57,7 @@ const PlayerProfile = () => {
   };
 
   const handleProfilePictureChange = (image) => {
-    setFormData(prev => ({ ...prev, profilePicture: `/src/assets/${image}` }));
+    setFormData(prev => ({ ...prev, profilePicture: `https://jft51.github.io/gooma-united-soccer-team/src/assets/${image}` }));
   };
 
   const handleSave = async () => {
@@ -155,9 +155,9 @@ const PlayerProfile = () => {
                       {playerImages.map((image) => (
                         <img
                           key={image}
-                          src={`/src/assets/${image}`}
+                          src={`https://jft51.github.io/gooma-united-soccer-team/src/assets/${image}`}
                           alt={image}
-                          className={`w-16 h-16 object-cover rounded-full cursor-pointer ${formData.profilePicture === `/src/assets/${image}` ? 'border-4 border-red-500' : ''}`}
+                          className={`w-16 h-16 object-cover rounded-full cursor-pointer ${formData.profilePicture === `https://jft51.github.io/gooma-united-soccer-team/src/assets/${image}` ? 'border-4 border-red-500' : ''}`}
                           onClick={() => handleProfilePictureChange(image)}
                         />
                       ))}

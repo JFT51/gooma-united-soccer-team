@@ -700,10 +700,10 @@ const Admin = () => {
                     {playerImages.map((image) => (
                         <img
                             key={image}
-                            src={`/src/assets/${image}`}
+                            src={`https://jft51.github.io/gooma-united-soccer-team/src/assets/${image}`}
                             alt={image}
-                            className={`w-24 h-24 object-cover rounded-full cursor-pointer ${playerForm.profilePicture === `/src/assets/${image}` ? 'border-4 border-red-500' : ''}`}
-                            onClick={() => setPlayerForm({ ...playerForm, profilePicture: `/src/assets/${image}` })}
+                            className={`w-24 h-24 object-cover rounded-full cursor-pointer ${playerForm.profilePicture === `https://jft51.github.io/gooma-united-soccer-team/src/assets/${image}` ? 'border-4 border-red-500' : ''}`}
+                            onClick={() => setPlayerForm({ ...playerForm, profilePicture: `https://jft51.github.io/gooma-united-soccer-team/src/assets/${image}` })}
                         />
                     ))}
                   </div>
