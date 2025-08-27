@@ -11,7 +11,7 @@ const Footer = () => {
           {/* Logo and Description */}
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-3 mb-4">
-              <img src={logo} alt="Gooma United Logo" className="h-200 w-80" />
+              <img src={logo} alt="Gooma United Logo" className="h-40 w-100" />
               <span className="text-2xl font-bold">Gooma United</span>
             </div>
             <p className="text-gray-300 mb-4">
