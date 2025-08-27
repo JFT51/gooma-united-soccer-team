@@ -103,6 +103,23 @@
     "matchesPlayed": "Gespeelde wedstrijden",
     "surname": "Achternaam"
   },
+  "admin": {
+    "teams": {
+      "title": "Teambeheer",
+      "addNew": "Nieuw Team Toevoegen",
+      "name": "Teamnaam",
+      "fieldAddress": "Veldadres",
+      "primaryColor": "Hoofdkleur",
+      "secondaryColor": "Secundaire Kleur",
+      "add": "Team Toevoegen",
+      "edit": "Bewerken",
+      "save": "Opslaan",
+      "cancel": "Annuleren",
+      "delete": "Verwijderen",
+      "confirmDelete": "Weet je zeker dat je dit team wilt verwijderen?",
+      "uploadLogo": "Logo Uploaden"
+    }
+  },
   "match": {
     "details": {
       "title": "Wedstrijd Details",

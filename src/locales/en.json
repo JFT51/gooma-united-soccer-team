@@ -103,6 +103,23 @@
     "matchesPlayed": "Matches Played",
     "surname": "Surname"
   },
+  "admin": {
+    "teams": {
+      "title": "Team Management",
+      "addNew": "Add New Team",
+      "name": "Team Name",
+      "fieldAddress": "Field Address",
+      "primaryColor": "Primary Color",
+      "secondaryColor": "Secondary Color",
+      "add": "Add Team",
+      "edit": "Edit",
+      "save": "Save",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "confirmDelete": "Are you sure you want to delete this team?",
+      "uploadLogo": "Upload Logo"
+    }
+  },
   "match": {
     "details": {
       "title": "Match Details",
