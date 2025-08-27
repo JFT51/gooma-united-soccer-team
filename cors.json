@@ -1,0 +1,7 @@
+[
+  {
+    "origin": ["https://gooma.netlify.app"],
+    "method": ["GET", "POST", "HEAD"],
+    "maxAgeSeconds": 3600
+  }
+]
