@@ -2,10 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { User, MapPin, Calendar, Trophy, Target, Users, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getPlayers } from '../services/database.js';
-import player1 from '../assets/player1.jpg';
-import player2 from '../assets/player2.jpg';
-import player3 from '../assets/player3.jpg';
-import player4 from '../assets/player4.jpg';
 
 const Players = () => {
   const [players, setPlayers] = useState([]);
@@ -14,17 +10,14 @@ const Players = () => {
   const [positionFilter, setPositionFilter] = useState('all');
   const [selectedPlayer, setSelectedPlayer] = useState(null);
 
-  // Placeholder images for players
-  const playerImages = [player1, player2, player3, player4];
-
   useEffect(() => {
     const fetchPlayers = async () => {
       setLoading(true);
       const playerData = await getPlayers();
-      // Add placeholder images to players
-      const playersWithImages = playerData.map((player, index) => ({
+      // Use player.profilePicture for image
+      const playersWithImages = playerData.map((player) => ({
         ...player,
-        image: playerImages[index % playerImages.length]
+        image: player.profilePicture || `https://ui-avatars.com/api/?name=${player.name}&background=random`
       }));
       setPlayers(playersWithImages);
       setFilteredPlayers(playersWithImages);
