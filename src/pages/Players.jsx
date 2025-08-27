@@ -1,9 +1,25 @@
 import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { User, MapPin, Calendar, Trophy, Target, Users, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getPlayers } from '../services/database.js';
+import { useTranslation } from 'react-i18next';
+
+// Function to calculate age from birth date
+const calculateAge = (dateOfBirth) => {
+  if (!dateOfBirth) return null;
+  const birthDate = new Date(dateOfBirth);
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDifference = today.getMonth() - birthDate.getMonth();
+  if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  return age;
+};
 
 const Players = () => {
+  const { t } = useTranslation();
   const [players, setPlayers] = useState([]);
   const [filteredPlayers, setFilteredPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -14,13 +30,13 @@ const Players = () => {
     const fetchPlayers = async () => {
       setLoading(true);
       const playerData = await getPlayers();
-      // Use player.profilePicture for image
-      const playersWithImages = playerData.map((player) => ({
+      const playersWithImagesAndAge = playerData.map((player) => ({
         ...player,
-        image: player.profilePicture || `https://ui-avatars.com/api/?name=${player.name}&background=random`
+        image: player.profilePicture || `https://ui-avatars.com/api/?name=${player.name}&background=random`,
+        age: calculateAge(player.dateOfBirth) // Calculate age
       }));
-      setPlayers(playersWithImages);
-      setFilteredPlayers(playersWithImages);
+      setPlayers(playersWithImagesAndAge);
+      setFilteredPlayers(playersWithImagesAndAge);
       setLoading(false);
     };
 
@@ -59,7 +75,7 @@ const Players = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-red-600 mx-auto mb-4"></div>
-          <p className="text-xl text-gray-600">Loading players...</p>
+          <p className="text-xl text-gray-600">{t('players.loading')}</p>
         </div>
       </div>
     );
@@ -71,10 +87,10 @@ const Players = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Our Players
+            {t('players.title')}
           </h1>
           <p className="text-xl text-gray-600">
-            Meet the talented squad of Gooma United
+            {t('players.subtitle')}
           </p>
         </div>
 
@@ -84,11 +100,11 @@ const Players = () => {
             {positions.map((position) => (
               <Button
                 key={position}
-                variant={positionFilter === (position === 'All' ? 'all' : position) ? 'default' : 'outline'}
-                onClick={() => setPositionFilter(position === 'All' ? 'all' : position)}
-                className={positionFilter === (position === 'All' ? 'all' : position) ? 'bg-red-600 hover:bg-red-700' : ''}
+                variant={positionFilter === (position === 'All' ? 'all' : position.toLowerCase()) ? 'default' : 'outline'}
+                onClick={() => setPositionFilter(position === 'All' ? 'all' : position.toLowerCase())}
+                className={positionFilter === (position === 'All' ? 'all' : position.toLowerCase()) ? 'bg-red-600 hover:bg-red-700' : ''}
               >
-                {position}
+                {t(`players.positions.${position.toLowerCase()}`)}
               </Button>
             ))}
           </div>
@@ -114,7 +130,7 @@ const Players = () => {
                 </div>
                 <div className="absolute bottom-4 left-4">
                   <span className={`px-3 py-1 rounded-full text-sm font-medium ${getPositionColor(player.position)}`}>
-                    {player.position}
+                    {t(`players.positions.${player.position.toLowerCase()}`)}
                   </span>
                 </div>
               </div>
@@ -126,7 +142,7 @@ const Players = () => {
                 <div className="space-y-2 text-sm text-gray-600 mb-4">
                   <div className="flex items-center gap-2">
                     <Calendar size={16} />
-                    <span>{player.age} years old</span>
+                    <span>{player.age} {t('players.yearsOld')}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <MapPin size={16} />
@@ -138,14 +154,14 @@ const Players = () => {
                 <div className="grid grid-cols-3 gap-2 text-center text-sm">
                   <div className="bg-gray-50 rounded p-2">
                     <div className="font-bold text-red-600">{player.stats?.matches || 0}</div>
-                    <div className="text-gray-600">Matches</div>
+                    <div className="text-gray-600">{t('players.matches')}</div>
                   </div>
                   <div className="bg-gray-50 rounded p-2">
                     <div className="font-bold text-red-600">
                       {player.stats?.goals || player.stats?.cleanSheets || 0}
                     </div>
                     <div className="text-gray-600">
-                      {player.position === 'Goalkeeper' ? 'Clean Sheets' : 'Goals'}
+                      {player.position === 'Goalkeeper' ? t('players.cleanSheets') : t('players.goals')}
                     </div>
                   </div>
                   <div className="bg-gray-50 rounded p-2">
@@ -153,7 +169,7 @@ const Players = () => {
                       {player.stats?.assists || player.stats?.saves || 0}
                     </div>
                     <div className="text-gray-600">
-                      {player.position === 'Goalkeeper' ? 'Saves' : 'Assists'}
+                      {player.position === 'Goalkeeper' ? t('players.saves') : t('players.assists')}
                     </div>
                   </div>
                 </div>
@@ -166,10 +182,10 @@ const Players = () => {
           <div className="text-center py-12">
             <Users size={64} className="mx-auto text-gray-400 mb-4" />
             <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              No players found
+              {t('players.noPlayers')}
             </h3>
             <p className="text-gray-600">
-              No players match the selected position filter.
+              {t('players.noPlayersFilter')}
             </p>
           </div>
         )}
@@ -199,7 +215,7 @@ const Players = () => {
                       <h2 className="text-3xl font-bold mb-2">{selectedPlayer.name}</h2>
                       <div className="flex items-center gap-4">
                         <span className={`px-3 py-1 rounded-full text-sm font-medium ${getPositionColor(selectedPlayer.position)}`}>
-                          {selectedPlayer.position}
+                          {t(`players.positions.${selectedPlayer.position.toLowerCase()}`)}
                         </span>
                         <span className="bg-red-600 text-white rounded-full px-3 py-1 text-sm font-bold">
                           #{selectedPlayer.jerseyNumber}
@@ -213,53 +229,53 @@ const Players = () => {
                 <div className="p-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3">Player Info</h3>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('players.playerInfo')}</h3>
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Age:</span>
-                          <span className="font-medium">{selectedPlayer.age} years</span>
+                          <span className="text-gray-600">{t('players.age')}:</span>
+                          <span className="font-medium">{selectedPlayer.age} {t('players.years')}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Nationality:</span>
+                          <span className="text-gray-600">{t('players.nationality')}:</span>
                           <span className="font-medium">{selectedPlayer.nationality}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Position:</span>
-                          <span className="font-medium">{selectedPlayer.position}</span>
+                          <span className="text-gray-600">{t('players.position')}:</span>
+                          <span className="font-medium">{t(`players.positions.${selectedPlayer.position.toLowerCase()}`)}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Jersey Number:</span>
+                          <span className="text-gray-600">{t('players.jerseyNumber')}:</span>
                           <span className="font-medium">#{selectedPlayer.jerseyNumber}</span>
                         </div>
                       </div>
                     </div>
 
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3">Season Stats</h3>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('players.seasonStats')}</h3>
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Matches Played:</span>
+                          <span className="text-gray-600">{t('players.matchesPlayed')}:</span>
                           <span className="font-medium">{selectedPlayer.stats?.matches || 0}</span>
                         </div>
                         {selectedPlayer.position === 'Goalkeeper' ? (
                           <>
                             <div className="flex justify-between">
-                              <span className="text-gray-600">Clean Sheets:</span>
+                              <span className="text-gray-600">{t('players.cleanSheets')}:</span>
                               <span className="font-medium">{selectedPlayer.stats?.cleanSheets || 0}</span>
                             </div>
                             <div className="flex justify-between">
-                              <span className="text-gray-600">Saves:</span>
+                              <span className="text-gray-600">{t('players.saves')}:</span>
                               <span className="font-medium">{selectedPlayer.stats?.saves || 0}</span>
                             </div>
                           </>
                         ) : (
                           <>
                             <div className="flex justify-between">
-                              <span className="text-gray-600">Goals:</span>
+                              <span className="text-gray-600">{t('players.goals')}:</span>
                               <span className="font-medium">{selectedPlayer.stats?.goals || 0}</span>
                             </div>
                             <div className="flex justify-between">
-                              <span className="text-gray-600">Assists:</span>
+                              <span className="text-gray-600">{t('players.assists')}:</span>
                               <span className="font-medium">{selectedPlayer.stats?.assists || 0}</span>
                             </div>
                           </>
@@ -270,7 +286,7 @@ const Players = () => {
 
                   {/* Player Surname */}
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-3">Surname</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('players.surname')}</h3>
                     <p className="text-gray-600 leading-relaxed">{selectedPlayer.surname}</p>
                   </div>
                 </div>

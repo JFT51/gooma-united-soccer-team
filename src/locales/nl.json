@@ -73,13 +73,34 @@
   },
   "players": {
     "title": "Spelers",
+    "subtitle": "Ontmoet de getalenteerde selectie van Gooma United",
     "position": "Positie",
     "dateOfBirth": "Geboortedatum",
     "nationality": "Nationaliteit",
     "jerseyNumber": "Rugnummer",
     "loading": "Spelers laden...",
     "noPlayers": "Geen spelers gevonden",
-    "viewProfile": "Bekijk Profiel"
+    "viewProfile": "Bekijk Profiel",
+    "positions": {
+      "all": "Alle",
+      "goalkeeper": "Doelman",
+      "defender": "Verdediger",
+      "midfielder": "Middenvelder",
+      "forward": "Aanvaller"
+    },
+    "yearsOld": "jaar oud",
+    "matches": "Wedstrijden",
+    "cleanSheets": "Clean Sheets",
+    "goals": "Doelpunten",
+    "saves": "Reddingen",
+    "assists": "Assists",
+    "noPlayersFilter": "Geen spelers gevonden die overeenkomen met de geselecteerde positie.",
+    "playerInfo": "Spelerinformatie",
+    "age": "Leeftijd",
+    "years": "jaar",
+    "seasonStats": "Seizoensstatistieken",
+    "matchesPlayed": "Gespeelde wedstrijden",
+    "surname": "Achternaam"
   },
   "match": {
     "details": {
