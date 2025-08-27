@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Globe } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import logo from '../assets/gooma-united-logo.png';
+import logo from '../assets/logo01.png';
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -29,10 +29,10 @@ const Navigation = () => {
     <nav className="bg-red-600 text-white shadow-lg sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20">
-          <div className="flex items-center">
-            <Link to="/" className="flex-shrink-0 flex items-center space-x-3">
-              <img src={logo} alt="Gooma United Logo" className="h-12 w-12" />
-              <span className="text-2xl font-bold">Gooma United</span>
+          <div className="flex items-center relative">
+            <Link to="/" className="flex-shrink-0 flex items-center">
+              <img src={logo} alt="Gooma United Logo" className="absolute left-0 bottom-0 transform translate-y-1/2 h-24 w-24" />
+              <span className="text-2xl font-bold pl-28">Gooma United</span>
             </Link>
           </div>
 
