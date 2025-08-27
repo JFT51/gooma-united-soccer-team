@@ -139,64 +139,11 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Upcoming Matches */}
-      <section className="py-20 bg-gradient-to-b from-gray-50 to-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">{t('home.upcomingMatches.title')}</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">{t('home.upcomingMatches.subtitle')}</p>
-          </div>
-
-          {loading ? (
-            <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto"></div>
-              <p className="mt-4 text-gray-600">{t('home.upcomingMatches.loading')}</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-              {upcomingMatches.length > 0 ? upcomingMatches.map((match, index) => (
-                <div key={index} className="bg-white rounded-2xl shadow-xl p-8 transform hover:scale-105 transition-all duration-300 hover:shadow-2xl border border-gray-100">
-                  <div className="text-center">
-                    <div className="inline-block bg-red-50 text-red-600 px-4 py-2 rounded-full text-sm font-semibold mb-4">
-                      {match.competition}
-                    </div>
-                    <div className="text-xl font-bold text-gray-900 mb-4">
-                      Gooma United <span className="text-red-600">vs</span> {match.opponent}
-                    </div>
-                    <div className="text-2xl font-bold text-red-600 mb-4 bg-red-50 rounded-lg py-3">
-                      {formatDate(match.date)}
-                    </div>
-                    <div className="text-gray-600 mb-6 flex items-center justify-center">
-                      <span className="text-lg">📍</span>
-                      <span className="ml-2">{match.venue}</span>
-                    </div>
-                    <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium ${
-                      match.isHome
-                        ? 'bg-green-100 text-green-800 border border-green-200'
-                        : 'bg-blue-100 text-blue-800 border border-blue-200'
-                    }`}>
-                      <span className={`w-2 h-2 rounded-full mr-2 ${match.isHome ? 'bg-green-400' : 'bg-blue-400'}`}></span>
-                      {match.isHome ? t('home.upcomingMatches.home') : t('home.upcomingMatches.away')}
-                    </div>
-                  </div>
-                </div>
-              )) : (
-                <div className="col-span-3 text-center py-12">
-                  <div className="text-6xl mb-4">📅</div>
-                  <p className="text-gray-500 text-lg">{t('home.upcomingMatches.noMatches')}</p>
-                </div>
-              )}
-            </div>
-          )}
-
-          <div className="text-center">
-            <Button asChild className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200">
-              <Link to="/calendar">
-                {t('home.upcomingMatches.viewFullCalendar')}
-                <ArrowRight className="ml-2" size={18} />
-              </Link>
-            </Button>
-          </div>
+      {/* Sponsor Section */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <img src="https://jft51.github.io/gooma-united-soccer-team/src/assets/mp.png" alt="Sponsor Logo" className="mx-auto h-48" />
+          <p className="mt-4 text-2xl font-bold">Voor elke Monsieur de juiste Pneus</p>
         </div>
       </section>
 
