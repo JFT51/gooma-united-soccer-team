@@ -2,9 +2,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-/* Import Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@300;400;500;600;700;800;900&family=Gochi+Hand&display=swap');
-
 /* Custom CSS Variables and Theme */
 @custom-variant dark (&:is(.dark *));
 
