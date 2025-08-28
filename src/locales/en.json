@@ -70,5 +70,31 @@
     "password": "Password",
     "email": "Email",
     "confirmPassword": "Confirm Password"
+  },
+  "calendar": {
+    "title": "Match Calendar",
+    "subtitle": "Follow Gooma United's journey through the season",
+    "filters": {
+      "all": "All Matches",
+      "upcoming": "Upcoming",
+      "completed": "Completed",
+      "home": "Home",
+      "away": "Away"
+    },
+    "status": {
+      "upcoming": "Upcoming",
+      "completed": "Completed"
+    },
+    "noMatches": {
+      "title": "No matches found",
+      "subtitle": "No matches scheduled for the selected period and filters."
+    },
+    "legend": {
+      "title": "Legend",
+      "home": "Home Match",
+      "away": "Away Match",
+      "upcoming": "Upcoming",
+      "completed": "Completed"
+    }
   }
 }

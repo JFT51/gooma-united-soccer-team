@@ -117,5 +117,31 @@
       "loading": "Wedstrijd details laden...",
       "noDetails": "Geen wedstrijd details beschikbaar"
     }
+  },
+  "calendar": {
+    "title": "Wedstrijdkalender",
+    "subtitle": "Volg de reis van Gooma United door het seizoen",
+    "filters": {
+      "all": "Alle wedstrijden",
+      "upcoming": "Aankomende",
+      "completed": "Voltooid",
+      "home": "Thuis",
+      "away": "Uit"
+    },
+    "status": {
+      "upcoming": "Aankomende",
+      "completed": "Voltooid"
+    },
+    "noMatches": {
+      "title": "Geen wedstrijden gevonden",
+      "subtitle": "Geen wedstrijden gepland voor de geselecteerde periode en filters."
+    },
+    "legend": {
+      "title": "Legende",
+      "home": "Thuiswedstrijd",
+      "away": "Uitwedstrijd",
+      "upcoming": "Aankomende",
+      "completed": "Voltooid"
+    }
   }
 }
