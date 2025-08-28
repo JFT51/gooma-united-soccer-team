@@ -222,9 +222,18 @@ const Calendar = () => {
                           <Clock size={16} />
                           <span>{formatTime(match.date)}</span>
                         </div>
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-2">
                           <MapPin size={16} />
                           <span>{match.venue}</span>
+                          <a
+                            href={`https://waze.com/ul?q=${encodeURIComponent(match.venue)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="ml-2 px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-xs font-semibold flex items-center gap-1"
+                          >
+                            {/* You can replace this emoji with a Waze SVG/icon if available */}
+                            <span role="img" aria-label="Waze">🚗</span> Waze
+                          </a>
                         </div>
                       </div>
                     </div>
