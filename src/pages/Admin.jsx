@@ -30,6 +30,7 @@ import {
   deleteMatch,
   deletePlayer,
   deleteNewsPost,
+  getTeamByName,
   addTeam,
   getTeams,
   updateTeam,
@@ -86,26 +87,63 @@ const Admin = () => {
   });
 
   useEffect(() => {
+    console.log('Admin component mounted. currentUser:', currentUser);
     if (currentUser) {
+      console.log('currentUser exists, calling fetchData...');
       fetchData();
+    } else {
+      console.log('currentUser does not exist.');
     }
   }, [currentUser]);
 
   const fetchData = async () => {
+    console.log('fetchData called');
     setLoading(true);
     try {
+      console.log('Fetching data from Firestore...');
       const [matchesData, playersData, newsData, teamsData] = await Promise.all([
         getMatches(),
         getPlayers(),
         getNewsPosts(),
         getTeams()
       ]);
+      console.log('Data fetched successfully:', { matchesData, playersData, newsData, teamsData });
       setMatches(matchesData);
       setPlayers(playersData);
       setNews(newsData);
       setTeams(teamsData);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('Error in fetchData:', error);
+    } finally {
+      console.log('fetchData finished');
+      setLoading(false);
+    }
+  };
+
+  const handlePopulateTeams = async () => {
+    setLoading(true);
+    try {
+      const matches = await getMatches();
+      const teamNames = new Set(matches.map(match => match.opponent));
+      teamNames.add("Gooma United");
+
+      let newTeamsCount = 0;
+      for (const name of teamNames) {
+        const existingTeam = await getTeamByName(name);
+        if (!existingTeam) {
+          await addTeam({
+            name: name,
+            home_address: "",
+            club_color1: "#000000",
+            club_color2: "#FFFFFF",
+          });
+          newTeamsCount++;
+        }
+      }
+      alert(`${newTeamsCount} new teams have been populated. Please refresh if you don't see them in the Teams tab.`);
+    } catch (error) {
+      console.error('Error populating teams:', error);
+      alert('An error occurred while populating teams.');
     } finally {
       setLoading(false);
     }
@@ -287,7 +325,9 @@ const Admin = () => {
     );
   }
 
-  const renderDashboard = () => (
+  const renderDashboard = () => {
+    console.log('Rendering Dashboard. State:', { matches, players, news });
+    return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
       <div className="bg-white rounded-lg shadow-lg p-6">
         <div className="flex items-center justify-between">
@@ -316,8 +356,90 @@ const Admin = () => {
           <FileText className="text-purple-600" size={32} />
         </div>
       </div>
+      <div className="bg-white rounded-lg shadow-lg p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-gray-600">Team Management</p>
+            <Button onClick={handlePopulateTeams} className="mt-2 bg-blue-600 hover:bg-blue-700">
+                Populate Teams from Calendar
+            </Button>
+          </div>
+          <Users className="text-orange-600" size={32} />
+        </div>
+      </div>
     </div>
-  );
+  )};
+
+  const renderTeams = () => {
+    const handleTeamUpdate = (id, field, value) => {
+      setTeams(teams.map(team => team.id === id ? { ...team, [field]: value } : team));
+    };
+
+    const handleSaveTeam = async (team) => {
+      try {
+        await updateTeam(team.id, {
+          home_address: team.home_address,
+          club_color1: team.club_color1,
+          club_color2: team.club_color2,
+        });
+        alert('Team updated successfully!');
+      } catch (error) {
+        console.error('Error updating team:', error);
+        alert('Error updating team.');
+      }
+    };
+
+    return (
+      <div className="bg-white rounded-lg shadow-lg">
+        <div className="p-6 border-b border-gray-200">
+          <h2 className="text-xl font-bold text-gray-900">Manage Teams</h2>
+        </div>
+        <div className="p-6">
+          <div className="space-y-4">
+            {teams.map((team) => (
+              <div key={team.id} className="border rounded-lg p-4">
+                <h3 className="font-bold mb-2">{team.name}</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Home Address</label>
+                    <input
+                      type="text"
+                      value={team.home_address || ''}
+                      onChange={(e) => handleTeamUpdate(team.id, 'home_address', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Club Color 1</label>
+                    <input
+                      type="color"
+                      value={team.club_color1 || '#000000'}
+                      onChange={(e) => handleTeamUpdate(team.id, 'club_color1', e.target.value)}
+                      className="w-full h-10 px-1 py-1 border border-gray-300 rounded-md"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Club Color 2</label>
+                    <input
+                      type="color"
+                      value={team.club_color2 || '#FFFFFF'}
+                      onChange={(e) => handleTeamUpdate(team.id, 'club_color2', e.target.value)}
+                      className="w-full h-10 px-1 py-1 border border-gray-300 rounded-md"
+                    />
+                  </div>
+                </div>
+                <div className="flex justify-end mt-4">
+                  <Button onClick={() => handleSaveTeam(team)} className="bg-red-600 hover:bg-red-700">
+                    Save
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   const renderMatches = () => (
     <div className="bg-white rounded-lg shadow-lg">
@@ -373,16 +495,14 @@ const Admin = () => {
                               console.log('Match deleted successfully from database');
 
                               // Force refresh data immediately
-                              const [matchesData, playersData, newsData, teamsData] = await Promise.all([
+                              const [matchesData, playersData, newsData] = await Promise.all([
                                 getMatches(),
                                 getPlayers(),
-                                getNewsPosts(),
-                                getTeams()
+                                getNewsPosts()
                               ]);
                               setMatches(matchesData);
                               setPlayers(playersData);
                               setNews(newsData);
-                              setTeams(teamsData);
 
                               console.log('UI updated with fresh data');
                               alert('Match deleted successfully!');
@@ -392,16 +512,14 @@ const Admin = () => {
 
                               // Still refresh data even if delete failed
                               try {
-                                const [matchesData, playersData, newsData, teamsData] = await Promise.all([
+                                const [matchesData, playersData, newsData] = await Promise.all([
                                   getMatches(),
                                   getPlayers(),
-                                  getNewsPosts(),
-                                  getTeams()
+                                  getNewsPosts()
                                 ]);
                                 setMatches(matchesData);
                                 setPlayers(playersData);
                                 setNews(newsData);
-                                setTeams(teamsData);
                               } catch (refreshError) {
                                 console.error('Error refreshing data:', refreshError);
                               }
@@ -524,119 +642,317 @@ const Admin = () => {
     </div>
   );
 
-  const renderTeams = () => {
-    const handlePopulateTeams = async () => {
-      setLoading(true);
-      try {
-        const allMatches = await getMatches();
-        const uniqueTeams = new Set();
-        uniqueTeams.add('Gooma United'); // Add the home team
-
-        allMatches.forEach(match => {
-          uniqueTeams.add(match.opponent);
-        });
-
-        for (const teamName of Array.from(uniqueTeams)) {
-          // Check if team already exists to prevent duplicates
-          const existingTeams = await getTeams();
-          const teamExists = existingTeams.some(team => team.name === teamName);
-
-          if (!teamExists) {
-            await addTeam({
-              name: teamName,
-              homeAddress: '',
-              clubColor1: '',
-              clubColor2: '',
-            });
-          }
-        }
-        await fetchData(); // Refresh data after populating
-        alert('Teams populated successfully!');
-      } catch (error) {
-        console.error('Error populating teams:', error);
-        alert('Error populating teams.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const handleUpdateTeamDetails = async (teamId, field, value) => {
-      setLoading(true);
-      try {
-        await updateTeam(teamId, { [field]: value });
-        await fetchData(); // Refresh data after update
-        alert('Team updated successfully!');
-      } catch (error) {
-        console.error('Error updating team:', error);
-        alert('Error updating team.');
-      } finally {
-        setLoading(false);
-      }
-    };
+  const renderModal = () => {
+    if (!showModal) return null;
 
     return (
-      <div className="bg-white rounded-lg shadow-lg">
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-bold text-gray-900">Manage Teams</h2>
-            <Button onClick={handlePopulateTeams} className="bg-blue-600 hover:bg-blue-700">
-              Populate Teams (One-time)
-            </Button>
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="p-6 border-b border-gray-200">
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-bold">
+                {editingItem ? 'Edit' : 'Add'} {modalType === 'match' ? 'Match' : modalType === 'player' ? 'Player' : 'News Article'}
+              </h3>
+              <Button variant="ghost" onClick={closeModal}>
+                <X size={20} />
+              </Button>
+            </div>
           </div>
-        </div>
-        <div className="p-6">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left py-2">Team Name</th>
-                  <th className="text-left py-2">Home Address</th>
-                  <th className="text-left py-2">Club Color 1</th>
-                  <th className="text-left py-2">Club Color 2</th>
-                  <th className="text-left py-2">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {teams.map((team) => (
-                  <tr key={team.id} className="border-b">
-                    <td className="py-2">{team.name}</td>
-                    <td className="py-2">
-                      <input
-                        type="text"
-                        value={team.homeAddress}
-                        onChange={(e) => handleUpdateTeamDetails(team.id, 'homeAddress', e.target.value)}
-                        className="w-full px-2 py-1 border border-gray-300 rounded-md"
-                      />
-                    </td>
-                    <td className="py-2">
-                      <input
-                        type="color"
-                        value={team.clubColor1}
-                        onChange={(e) => handleUpdateTeamDetails(team.id, 'clubColor1', e.target.value)}
-                        className="w-10 h-10 cursor-pointer"
-                      />
-                    </td>
-                    <td className="py-2">
-                      <input
-                        type="color"
-                        value={team.clubColor2}
-                        onChange={(e) => handleUpdateTeamDetails(team.id, 'clubColor2', e.target.value)}
-                        className="w-10 h-10 cursor-pointer"
-                      />
-                    </td>
-                    <td className="py-2">
-                      {/* No specific delete for teams, as they are derived from matches */}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="p-6">
+            {modalType === 'match' && (
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="opponent" className="block text-sm font-medium text-gray-700 mb-1">Opponent</label>
+                  <input
+                    id="opponent"
+                    type="text"
+                    value={matchForm.opponent}
+                    onChange={(e) => setMatchForm({...matchForm, opponent: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    autoComplete="organization"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                    <input
+                      id="date"
+                      type="date"
+                      value={matchForm.date}
+                      onChange={(e) => setMatchForm({...matchForm, date: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                      autoComplete="off"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="time" className="block text-sm font-medium text-gray-700 mb-1">Time</label>
+                    <input
+                      id="time"
+                      type="time"
+                      value={matchForm.time}
+                      onChange={(e) => setMatchForm({...matchForm, time: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                      autoComplete="off"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label htmlFor="venue" className="block text-sm font-medium text-gray-700 mb-1">Venue</label>
+                  <input
+                    id="venue"
+                    type="text"
+                    value={matchForm.venue}
+                    onChange={(e) => setMatchForm({...matchForm, venue: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    autoComplete="off"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                    <select
+                      value={matchForm.type}
+                      onChange={(e) => setMatchForm({...matchForm, type: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    >
+                      <option value="home">Thuismatch</option>
+                      <option value="away">Uitmatch</option>
+                      <option value="other">Andere Locatie</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Competition</label>
+                    <select
+                      value={matchForm.competition}
+                      onChange={(e) => setMatchForm({...matchForm, competition: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    >
+                      <option value="Kampioenschap">Kampioenschap</option>
+                      <option value="Beker">Beker</option>
+                      <option value="Vriendschappelijk">Vriendschappelijk</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="flex justify-end gap-2 pt-4">
+                  <Button variant="outline" onClick={closeModal}>Cancel</Button>
+                  <Button onClick={handleAddMatch} disabled={loading} className="bg-red-600 hover:bg-red-700">
+                    {loading ? 'Saving...' : 'Save Match'}
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {modalType === 'player' && (
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                  <input
+                    id="name"
+                    type="text"
+                    value={playerForm.name}
+                    onChange={(e) => setPlayerForm({...playerForm, name: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    autoComplete="name"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="position" className="block text-sm font-medium text-gray-700 mb-1">Position</label>
+                    <select
+                      id="position"
+                      value={playerForm.position}
+                      onChange={(e) => setPlayerForm({...playerForm, position: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                      autoComplete="organization-title"
+                    >
+                      <option value="">Select Position</option>
+                      <option value="Goalkeeper">Goalkeeper</option>
+                      <option value="Defender">Defender</option>
+                      <option value="Midfielder">Midfielder</option>
+                      <option value="Forward">Forward</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label htmlFor="jerseyNumber" className="block text-sm font-medium text-gray-700 mb-1">Jersey Number</label>
+                    <input
+                      id="jerseyNumber"
+                      type="number"
+                      value={playerForm.jerseyNumber}
+                      onChange={(e) => setPlayerForm({...playerForm, jerseyNumber: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                      autoComplete="off"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <input
+                    id="email"
+                    type="email"
+                    value={playerForm.email}
+                    onChange={(e) => setPlayerForm({...playerForm, email: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    disabled={!!editingItem} // Disable email editing for existing players
+                    autoComplete="email"
+                  />
+                </div>
+                {!editingItem && ( // Only show password field for new players
+                  <div>
+                    <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input
+                      id="password"
+                      type="password"
+                      value={playerForm.password}
+                      onChange={(e) => setPlayerForm({...playerForm, password: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                      autoComplete="new-password"
+                    />
+                  </div>
+                )}
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <label htmlFor="birthDate" className="block text-sm font-medium text-gray-700 mb-1">Birth Date</label>
+                    <input
+                      id="birthDate"
+                      type="date"
+                      value={playerForm.birthDate}
+                      onChange={(e) => setPlayerForm({...playerForm, birthDate: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                      autoComplete="bday"
+                    />
+                  </div>
+
+                </div>
+                <div>
+                  <label htmlFor="nationality" className="block text-sm font-medium text-gray-700 mb-1">Nationality</label>
+                  <input
+                    id="nationality"
+                    type="text"
+                    value={playerForm.nationality}
+                    onChange={(e) => setPlayerForm({...playerForm, nationality: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    autoComplete="country-name"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="surname" className="block text-sm font-medium text-gray-700 mb-1">Surname</label>
+                  <input
+                    id="surname"
+                    type="text"
+                    value={playerForm.surname}
+                    onChange={(e) => setPlayerForm({...playerForm, surname: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    autoComplete="family-name"
+                  />
+                </div>
+                {/* Profile Picture Upload */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Profile Picture</label>
+                  <div className="grid grid-cols-3 gap-4">
+                    {playerImages.map((image) => (
+                        <img
+                            key={image}
+                            src={`https://jft51.github.io/gooma-united-soccer-team/src/assets/${image}`}
+                            alt={image}
+                            className={`w-24 h-24 object-cover rounded-full cursor-pointer ${playerForm.profilePicture === `https://jft51.github.io/gooma-united-soccer-team/src/assets/${image}` ? 'border-4 border-red-500' : ''}`}
+                            onClick={() => setPlayerForm({ ...playerForm, profilePicture: `https://jft51.github.io/gooma-united-soccer-team/src/assets/${image}` })}
+                        />
+                    ))}
+                  </div>
+                  {playerForm.profilePicture && (
+                    <img src={playerForm.profilePicture} alt="Profile" className="mt-2 h-20 w-20 object-cover rounded-full" />
+                  )}
+                </div>
+                <div className="flex justify-end gap-2 pt-4">
+                  <Button variant="outline" onClick={closeModal}>Cancel</Button>
+                  <Button onClick={handleAddPlayer} disabled={loading} className="bg-red-600 hover:bg-red-700">
+                    {loading ? 'Saving...' : 'Save Player'}
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {modalType === 'news' && (
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                  <input
+                    id="title"
+                    type="text"
+                    value={newsForm.title}
+                    onChange={(e) => setNewsForm({...newsForm, title: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    autoComplete="off"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                    <select
+                      id="category"
+                      value={newsForm.category}
+                      onChange={(e) => setNewsForm({...newsForm, category: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                      autoComplete="off"
+                    >
+                      <option value="Match Results">Match Results</option>
+                      <option value="Transfers">Transfers</option>
+                      <option value="Training">Training</option>
+                      <option value="Community">Community</option>
+                      <option value="Tickets">Tickets</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label htmlFor="tags" className="block text-sm font-medium text-gray-700 mb-1">Tags (comma separated)</label>
+                    <input
+                      id="tags"
+                      type="text"
+                      value={newsForm.tags}
+                      onChange={(e) => setNewsForm({...newsForm, tags: e.target.value})}
+                      placeholder="e.g. victory, championship, final"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                      autoComplete="off"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-1">Content</label>
+                  <textarea
+                    id="content"
+                    value={newsForm.content}
+                    onChange={(e) => setNewsForm({...newsForm, content: e.target.value})}
+                    rows={6}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    autoComplete="off"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="featured" className="flex items-center gap-2">
+                    <input
+                      id="featured"
+                      type="checkbox"
+                      checked={newsForm.featured}
+                      onChange={(e) => setNewsForm({...newsForm, featured: e.target.checked})}
+                      className="rounded border-gray-300 text-red-600 focus:ring-red-500"
+                    />
+                    <span className="text-sm font-medium text-gray-700">Featured Article</span>
+                  </label>
+                </div>
+                <div className="flex justify-end gap-2 pt-4">
+                  <Button variant="outline" onClick={closeModal}>Cancel</Button>
+                  <Button onClick={handleAddNews} disabled={loading} className="bg-red-600 hover:bg-red-700">
+                    {loading ? 'Saving...' : 'Save Article'}
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
     );
   };
 
+  try {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -702,6 +1018,10 @@ const Admin = () => {
       {renderModal()}
     </div>
   );
+  } catch (error) {
+    console.error("Error rendering Admin component:", error);
+    return <div>An error occurred. Please check the console.</div>;
+  }
 };
 
 export default Admin;
