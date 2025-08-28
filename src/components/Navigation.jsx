@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import { Menu, X, Globe } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import logo from '../assets/logo01.svg';
@@ -18,11 +18,6 @@ const Navigation = () => {
     { path: '/admin', labelKey: 'nav.admin' },
     { path: '/player-profile', labelKey: 'nav.playerLogin' }
   ];
-
-  const navLinkClass = ({ isActive }) =>
-    isActive
-      ? 'block py-2 px-3 text-white bg-red-500 rounded-md transition-colors duration-300'
-      : 'block py-2 px-3 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md transition-colors duration-300';
 
   const changeLanguage = (lng) => {
     i18n.changeLanguage(lng);
@@ -53,20 +48,22 @@ const Navigation = () => {
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center space-x-1">
             {navItems.map((item) => (
-              <Link
+              <NavLink
                 key={item.path}
                 to={item.path}
-                className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                  isActive(item.path)
-                    ? 'text-red-600 bg-red-50'
-                    : 'text-gray-700 hover:text-red-600 hover:bg-gray-50'
-                }`}
+                className={({ isActive }) =>
+                  `relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    isActive
+                      ? 'text-red-600 bg-red-50'
+                      : 'text-gray-700 hover:text-red-600 hover:bg-gray-50'
+                  }`
+                }
               >
                 {t(item.labelKey)}
-                {isActive(item.path) && (
+                {location.pathname === item.path && (
                   <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-6 h-0.5 bg-red-600 rounded-full"></span>
                 )}
-              </Link>
+              </NavLink>
             ))}
           </div>
 
@@ -104,18 +101,20 @@ const Navigation = () => {
       }`}>
         <div className="px-4 pt-2 pb-4 space-y-1 bg-white border-t border-gray-200">
           {navItems.map((item) => (
-            <Link
+            <NavLink
               key={item.path}
               to={item.path}
-              className={`block px-3 py-2 rounded-md text-base font-medium transition-all duration-200 ${
-                isActive(item.path)
-                  ? 'text-red-600 bg-red-50'
-                  : 'text-gray-700 hover:text-red-600 hover:bg-gray-50'
-              }`}
+              className={({ isActive }) =>
+                `block px-3 py-2 rounded-md text-base font-medium transition-all duration-200 ${
+                  isActive
+                    ? 'text-red-600 bg-red-50'
+                    : 'text-gray-700 hover:text-red-600 hover:bg-gray-50'
+                }`
+              }
               onClick={() => setIsOpen(false)}
             >
               {t(item.labelKey)}
-            </Link>
+            </NavLink>
           ))}
 
           {/* Mobile Language Switcher */}
