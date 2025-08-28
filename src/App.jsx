@@ -11,6 +11,8 @@ import History from './pages/History.jsx';
 import Admin from './pages/Admin.jsx';
 import PlayerProfile from './pages/PlayerProfile.jsx';
 import './App.css';
+import './styles/global.css';
+import './styles/slogan.css';
 
 function App() {
   return (
