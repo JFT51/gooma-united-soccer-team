@@ -1,15 +1,15 @@
-import { 
-  collection, 
-  doc, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
-  getDocs, 
-  getDoc, 
-  query, 
-  orderBy, 
+import {
+  collection,
+  doc,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  getDocs,
+  getDoc,
+  query,
+  orderBy,
   where,
-  limit 
+  limit
 } from 'firebase/firestore';
 import { db, storage } from '../lib/firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -28,6 +28,7 @@ export const addMatch = async (matchData) => {
     throw error;
   }
 };
+
 
 export const uploadProfilePicture = async (file, userId) => {
   try {
@@ -50,6 +51,7 @@ export const getMatches = async () => {
       return {
         id: doc.id,
         ...data,
+        isHome: data.type === 'home',
         date: data.date?.toDate ? data.date.toDate() : data.date,
         createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : data.createdAt,
         updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : data.updatedAt,
@@ -107,7 +109,7 @@ export const getPlayers = async () => {
       return {
         id: doc.id,
         ...data,
-        dateOfBirth: data.dateOfBirth?.toDate ? data.dateOfBirth.toDate() : data.dateOfBirth, // Convert dateOfBirth to Date object
+        birthDate: data.birthDate?.toDate ? data.birthDate.toDate() : data.birthDate,
         createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : data.createdAt,
         updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : data.updatedAt,
       };
@@ -198,7 +200,7 @@ export const addNewsPost = async (postData) => {
 export const getNewsPosts = async (limitCount = 10) => {
   try {
     const q = query(
-      collection(db, 'news'), 
+      collection(db, 'news'),
       orderBy('createdAt', 'desc'),
       limit(limitCount)
     );
@@ -316,16 +318,21 @@ export const deleteVenue = async (venueId) => {
 };
 
 // Teams
-export const addTeam = async (teamData) => {
+export const getTeamByName = async (name) => {
   try {
-    const docRef = await addDoc(collection(db, 'teams'), {
-      ...teamData,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    });
-    return docRef.id;
+    const q = query(collection(db, 'teams'), where('name', '==', name));
+    const querySnapshot = await getDocs(q);
+    if (!querySnapshot.empty) {
+      const doc = querySnapshot.docs[0];
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+      };
+    }
+    return null;
   } catch (error) {
-    console.error('Error adding team:', error);
+    console.error('Error getting team by name:', error);
     throw error;
   }
 };
@@ -339,12 +346,24 @@ export const getTeams = async () => {
       return {
         id: doc.id,
         ...data,
-        createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : data.createdAt,
-        updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : data.updatedAt,
       };
     });
   } catch (error) {
     console.error('Error getting teams:', error);
+    throw error;
+  }
+};
+
+export const addTeam = async (teamData) => {
+  try {
+    const docRef = await addDoc(collection(db, 'teams'), {
+      ...teamData,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    });
+    return docRef.id;
+  } catch (error) {
+    console.error('Error adding team:', error);
     throw error;
   }
 };

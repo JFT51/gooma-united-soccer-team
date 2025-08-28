@@ -1,35 +1,47 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar as CalendarIcon, MapPin, Clock, Filter, Trophy, Home, Plane } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { getMatches } from '../services/database';
+import { getMatches, getTeams } from '../services/database';
+import { useTranslation } from 'react-i18next';
 
 const Calendar = () => {
+  const { t, i18n } = useTranslation();
   const [matches, setMatches] = useState([]);
+  const [teams, setTeams] = useState([]);
   const [filteredMatches, setFilteredMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all'); // all, upcoming, completed, home, away
 
-
   useEffect(() => {
-    const fetchMatches = async () => {
+    const fetchData = async () => {
       try {
-        const matchData = await getMatches();
+        const [matchData, teamData] = await Promise.all([getMatches(), getTeams()]);
         setMatches(matchData);
+        setTeams(teamData);
         setFilteredMatches(matchData);
       } catch (error) {
-        console.error('Error fetching matches:', error);
+        console.error('Error fetching data:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchMatches();
+    fetchData();
   }, []);
 
-
-
   useEffect(() => {
-    let filtered = matches;
+    let filtered = matches.map(match => {
+      const homeTeamName = match.isHome ? "Gooma United" : match.opponent;
+      const awayTeamName = match.isHome ? match.opponent : "Gooma United";
+      const homeTeam = teams.find(team => team.name === homeTeamName);
+      const awayTeam = teams.find(team => team.name === awayTeamName);
+      return {
+        ...match,
+        venue: homeTeam ? homeTeam.home_address : match.venue,
+        homeTeam,
+        awayTeam,
+      };
+    });
 
     // Apply status filter
     if (filter === 'upcoming') {
@@ -41,13 +53,27 @@ const Calendar = () => {
     } else if (filter === 'away') {
       filtered = filtered.filter(match => match.isHome === false);
     }
+
     setFilteredMatches(filtered);
-  }, [matches, filter]);
+  }, [matches, filter, teams]);
+
+  const getSquareStyle = (color) => {
+    const style = {
+      backgroundColor: color,
+      width: '12px',
+      height: '12px',
+      marginRight: '4px',
+    };
+    if (color && color.toLowerCase() === '#ffffff') {
+      style.border = '1px solid black';
+    }
+    return style;
+  };
 
   const formatDate = (timestamp) => {
     if (!timestamp) return '';
     const date = timestamp.seconds ? new Date(timestamp.seconds * 1000) : new Date(timestamp);
-    return date.toLocaleDateString('en-US', { 
+    return date.toLocaleDateString(i18n.language, {
       weekday: 'long', 
       year: 'numeric',
       month: 'long', 
@@ -58,7 +84,7 @@ const Calendar = () => {
   const formatTime = (timestamp) => {
     if (!timestamp) return '';
     const date = timestamp.seconds ? new Date(timestamp.seconds * 1000) : new Date(timestamp);
-    return date.toLocaleTimeString('en-US', { 
+    return date.toLocaleTimeString(i18n.language, {
       hour: '2-digit', 
       minute: '2-digit'
     });
@@ -86,13 +112,6 @@ const Calendar = () => {
     }
   };
 
-  const months = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ];
-
-  const years = [2024, 2025, 2026];
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -110,10 +129,10 @@ const Calendar = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Match Calendar
+            {t('calendar.title')}
           </h1>
           <p className="text-xl text-gray-600">
-            Follow Gooma United's journey through the season
+            {t('calendar.subtitle')}
           </p>
         </div>
 
@@ -126,21 +145,21 @@ const Calendar = () => {
                 onClick={() => setFilter('all')}
                 className={filter === 'all' ? 'bg-red-600 hover:bg-red-700' : ''}
               >
-                All Matches
+                {t('calendar.filters.all')}
               </Button>
               <Button
                 variant={filter === 'upcoming' ? 'default' : 'outline'}
                 onClick={() => setFilter('upcoming')}
                 className={filter === 'upcoming' ? 'bg-red-600 hover:bg-red-700' : ''}
               >
-                Upcoming
+                {t('calendar.filters.upcoming')}
               </Button>
               <Button
                 variant={filter === 'completed' ? 'default' : 'outline'}
                 onClick={() => setFilter('completed')}
                 className={filter === 'completed' ? 'bg-red-600 hover:bg-red-700' : ''}
               >
-                Completed
+                {t('calendar.filters.completed')}
               </Button>
               <Button
                 variant={filter === 'home' ? 'default' : 'outline'}
@@ -148,7 +167,7 @@ const Calendar = () => {
                 className={filter === 'home' ? 'bg-red-600 hover:bg-red-700' : ''}
               >
                 <Home size={16} className="mr-1" />
-                Home
+                {t('calendar.filters.home')}
               </Button>
               <Button
                 variant={filter === 'away' ? 'default' : 'outline'}
@@ -156,11 +175,10 @@ const Calendar = () => {
                 className={filter === 'away' ? 'bg-red-600 hover:bg-red-700' : ''}
               >
                 <Plane size={16} className="mr-1" />
-                Away
+                {t('calendar.filters.away')}
               </Button>
             </div>
 
-            
           </div>
         </div>
 
@@ -178,14 +196,19 @@ const Calendar = () => {
                           {match.competition}
                         </span>
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(match.status)}`}>
-                          {match.status === 'completed' ? 'Completed' : 'Upcoming'}
+                          {t(`calendar.status.${match.status}`)}
                         </span>
                       </div>
-                      
-                      <div className="flex items-center gap-4 mb-4">
-                        <div className="text-center">
-                          <div className="text-lg font-bold text-gray-900">
-                            {match.isHome ? 'Gooma United' : match.opponent}
+                      <div className="flex items-center justify-center gap-4 mb-4">
+                        <div className="text-right flex-1">
+                          <div className="text-lg font-bold text-gray-900 flex items-center justify-end">
+                            {match.homeTeam && (
+                              <>
+                                <div style={getSquareStyle(match.homeTeam.club_color1)}></div>
+                                <div style={getSquareStyle(match.homeTeam.club_color2)}></div>
+                              </>
+                            )}
+                            {match.isHome ? "Gooma United" : match.opponent}
                           </div>
                           {match.status === 'completed' && match.result && (
                             <div className="text-2xl font-bold text-red-600">
@@ -193,17 +216,18 @@ const Calendar = () => {
                             </div>
                           )}
                         </div>
-                        
-                        <div className="text-center px-4">
+                        <div className="text-center px-2">
                           <div className="text-sm text-gray-500">VS</div>
-                          {match.status === 'completed' && match.result && (
-                            <div className="text-lg font-bold text-gray-600">-</div>
-                          )}
                         </div>
-                        
-                        <div className="text-center">
-                          <div className="text-lg font-bold text-gray-900">
-                            {match.isHome ? match.opponent : 'Gooma United'}
+                        <div className="text-left flex-1">
+                          <div className="text-lg font-bold text-gray-900 flex items-center">
+                            {match.awayTeam && (
+                              <>
+                                <div style={getSquareStyle(match.awayTeam.club_color1)}></div>
+                                <div style={getSquareStyle(match.awayTeam.club_color2)}></div>
+                              </>
+                            )}
+                            {match.isHome ? match.opponent : "Gooma United"}
                           </div>
                           {match.status === 'completed' && match.result && (
                             <div className="text-2xl font-bold text-gray-600">
@@ -212,7 +236,6 @@ const Calendar = () => {
                           )}
                         </div>
                       </div>
-
                       <div className="flex flex-wrap gap-4 text-sm text-gray-600">
                         <div className="flex items-center gap-1">
                           <CalendarIcon size={16} />
@@ -231,13 +254,11 @@ const Calendar = () => {
                             rel="noopener noreferrer"
                             className="ml-2 px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-xs font-semibold flex items-center gap-1"
                           >
-                            {/* You can replace this emoji with a Waze SVG/icon if available */}
                             <span role="img" aria-label="Waze">🚗</span> Waze
                           </a>
                         </div>
                       </div>
                     </div>
-
                     <div className="mt-4 lg:mt-0 lg:ml-6">
                       <div className={`inline-flex items-center px-3 py-2 rounded-full text-sm font-medium ${
                         match.isHome 
@@ -265,34 +286,32 @@ const Calendar = () => {
             <div className="text-center py-12">
               <CalendarIcon size={64} className="mx-auto text-gray-400 mb-4" />
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                No matches found
+                {t('calendar.noMatches.title')}
               </h3>
               <p className="text-gray-600">
-                No matches scheduled for the selected period and filters.
+                {t('calendar.noMatches.subtitle')}
               </p>
             </div>
           )}
         </div>
-
-        {/* Legend */}
         <div className="mt-12 bg-white rounded-lg shadow-lg p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Legend</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('calendar.legend.title')}</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-green-100 border border-green-200 rounded"></div>
-              <span>Home Match</span>
+              <span>{t('calendar.legend.home')}</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-blue-100 border border-blue-200 rounded"></div>
-              <span>Away Match</span>
+              <span>{t('calendar.legend.away')}</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-blue-100 border border-blue-200 rounded"></div>
-              <span>Upcoming</span>
+              <span>{t('calendar.legend.upcoming')}</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-green-100 border border-green-200 rounded"></div>
-              <span>Completed</span>
+              <span>{t('calendar.legend.completed')}</span>
             </div>
           </div>
         </div>
@@ -300,6 +319,6 @@ const Calendar = () => {
     </div>
   );
 };
-
 export default Calendar;
+
 
