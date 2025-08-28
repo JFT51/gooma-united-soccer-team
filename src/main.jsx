@@ -2,6 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import './App.css';
+import './styles/global.css';
+import './styles/slogan.css';
 import './i18n';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
