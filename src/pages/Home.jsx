@@ -52,7 +52,7 @@ const Home = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
+  <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">
         {/* Hero Image Background - Make it more prominent */}
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0"
@@ -69,14 +69,14 @@ const Home = () => {
         <div className="relative z-20 text-center text-white max-w-4xl mx-auto px-4">
           {/* Text content without background */}
           <div className="rounded-3xl p-8 shadow-2xl">
-            <h1 className="text-6xl md:text-8xl font-bold mb-6 animate-fade-in" style={{textShadow: '3px 3px 6px rgba(0,0,0,0.9)'}}>
+            <h1 className="text-4xl md:text-6xl font-bold mb-4 animate-fade-in" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.7)'}}>
               GOOMA
-              <span className="block text-red-400" style={{textShadow: '3px 3px 6px rgba(0,0,0,0.9)'}}>UNITED</span>
+              <span className="block text-red-400" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.7)'}}>UNITED</span>
             </h1>
             <p className="text-xl md:text-2xl mb-8 text-gray-100 max-w-2xl mx-auto font-gochi" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.8)'}}>
               {t('home.hero.subtitle')}
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mt-2">
               <Button
                 asChild
                 className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 text-lg font-semibold transform hover:scale-105 transition-all duration-200 shadow-xl"
