@@ -51,6 +51,10 @@ const Home = () => {
 
   return (
     <div className="min-h-screen">
+      {/* Slogan Section */}
+      <div className="slogan-gochi">
+        When Gooma is United, they will never be divided
+      </div>
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         {/* Hero Image Background - Make it more prominent */}

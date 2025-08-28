@@ -189,115 +189,116 @@ const Calendar = () => {
               <div key={index} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-200">
                 <div className="p-6">
                   <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Trophy size={16} className="text-red-600" />
-                        <span className="text-sm font-medium text-red-600">
-                          {match.competition}
-                        </span>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(match.status)}`}>
-                          {t(`calendar.status.${match.status}`)}
-                        </span>
-                      </div>
-                      
-                      <div className="flex items-center justify-center gap-4 mb-4">
-                        <div className="text-right flex-1">
-                          <div className="text-lg font-bold text-gray-900 flex items-center justify-end">
-                            {match.homeTeam && (
-                              <>
-                                <div style={getSquareStyle(match.homeTeam.club_color1)}></div>
-                                <div style={getSquareStyle(match.homeTeam.club_color2)}></div>
-                              </>
-                            )}
-                            {match.isHome ? "Gooma United" : match.opponent}
-                          </div>
-                          {match.status === 'completed' && match.result && (
-                            <div className="text-2xl font-bold text-red-600">
-                              {match.isHome ? match.result.home : match.result.away}
+                    <div className="space-y-6">
+                      {filteredMatches.length > 0 ? (
+                        filteredMatches.map((match, index) => (
+                          <div key={index} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-200">
+                            <div className="p-6">
+                              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <Trophy size={16} className="text-red-600" />
+                                    <span className="text-sm font-medium text-red-600">
+                                      {match.competition}
+                                    </span>
+                                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(match.status)}`}>
+                                      {t(`calendar.status.${match.status}`)}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center justify-center gap-4 mb-4">
+                                    <div className="text-right flex-1">
+                                      <div className="text-lg font-bold text-gray-900 flex items-center justify-end">
+                                        {match.homeTeam && (
+                                          <>
+                                            <div style={getSquareStyle(match.homeTeam.club_color1)}></div>
+                                            <div style={getSquareStyle(match.homeTeam.club_color2)}></div>
+                                          </>
+                                        )}
+                                        {match.isHome ? "Gooma United" : match.opponent}
+                                      </div>
+                                      {match.status === 'completed' && match.result && (
+                                        <div className="text-2xl font-bold text-red-600">
+                                          {match.isHome ? match.result.home : match.result.away}
+                                        </div>
+                                      )}
+                                    </div>
+                                    <div className="text-center px-2">
+                                      <div className="text-sm text-gray-500">VS</div>
+                                    </div>
+                                    <div className="text-left flex-1">
+                                      <div className="text-lg font-bold text-gray-900 flex items-center">
+                                        {match.awayTeam && (
+                                          <>
+                                            <div style={getSquareStyle(match.awayTeam.club_color1)}></div>
+                                            <div style={getSquareStyle(match.awayTeam.club_color2)}></div>
+                                          </>
+                                        )}
+                                        {match.isHome ? match.opponent : "Gooma United"}
+                                      </div>
+                                      {match.status === 'completed' && match.result && (
+                                        <div className="text-2xl font-bold text-gray-600">
+                                          {match.isHome ? match.result.away : match.result.home}
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <div className="flex flex-wrap gap-4 text-sm text-gray-600">
+                                    <div className="flex items-center gap-1">
+                                      <CalendarIcon size={16} />
+                                      <span>{formatDate(match.date)}</span>
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                      <Clock size={16} />
+                                      <span>{formatTime(match.date)}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      <MapPin size={16} />
+                                      <span>{match.venue}</span>
+                                      <a
+                                        href={`https://waze.com/ul?q=${encodeURIComponent(match.venue)}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="ml-2 px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-xs font-semibold flex items-center gap-1"
+                                      >
+                                        <span role="img" aria-label="Waze">🚗</span> Waze
+                                      </a>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="mt-4 lg:mt-0 lg:ml-6">
+                                  <div className={`inline-flex items-center px-3 py-2 rounded-full text-sm font-medium ${
+                                    match.isHome 
+                                      ? 'bg-green-100 text-green-800' 
+                                      : 'bg-blue-100 text-blue-800'
+                                  }`}>
+                                    {match.isHome ? (
+                                      <>
+                                        <Home size={16} className="mr-1" />
+                                        Home
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Plane size={16} className="mr-1" />
+                                        Away
+                                      </>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
                             </div>
-                          )}
-                        </div>
-                        <div className="text-center px-2">
-                          <div className="text-sm text-gray-500">VS</div>
-                        </div>
-                        <div className="text-left flex-1">
-                          <div className="text-lg font-bold text-gray-900 flex items-center">
-                            {match.awayTeam && (
-                              <>
-                                <div style={getSquareStyle(match.awayTeam.club_color1)}></div>
-                                <div style={getSquareStyle(match.awayTeam.club_color2)}></div>
-                              </>
-                            )}
-                            {match.isHome ? match.opponent : "Gooma United"}
                           </div>
-                          {match.status === 'completed' && match.result && (
-                            <div className="text-2xl font-bold text-gray-600">
-                              {match.isHome ? match.result.away : match.result.home}
-                            </div>
-                          )}
+                        ))
+                      ) : (
+                        <div className="text-center py-12">
+                          <CalendarIcon size={64} className="mx-auto text-gray-400 mb-4" />
+                          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                            {t('calendar.noMatches.title')}
+                          </h3>
+                          <p className="text-gray-600">
+                            {t('calendar.noMatches.subtitle')}
+                          </p>
                         </div>
-                      </div>
-
-                      <div className="flex flex-wrap gap-4 text-sm text-gray-600">
-                        <div className="flex items-center gap-1">
-                          <CalendarIcon size={16} />
-                          <span>{formatDate(match.date)}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Clock size={16} />
-                          <span>{formatTime(match.date)}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <MapPin size={16} />
-                          <a
-                            href={`https://waze.com/ul?q=${encodeURIComponent(match.venue)}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="hover:text-red-600 transition-colors"
-                          >
-                            {match.venue}
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="mt-4 lg:mt-0 lg:ml-6">
-                      <div className={`inline-flex items-center px-3 py-2 rounded-full text-sm font-medium ${
-                        match.isHome 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-blue-100 text-blue-800'
-                      }`}>
-                        {match.isHome ? (
-                          <>
-                            <Home size={16} className="mr-1" />
-                            Home
-                          </>
-                        ) : (
-                          <>
-                            <Plane size={16} className="mr-1" />
-                            Away
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="text-center py-12">
-              <CalendarIcon size={64} className="mx-auto text-gray-400 mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                {t('calendar.noMatches.title')}
-              </h3>
-              <p className="text-gray-600">
-                {t('calendar.noMatches.subtitle')}
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* Legend */}
+                      )}
         <div className="mt-12 bg-white rounded-lg shadow-lg p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('calendar.legend.title')}</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
@@ -323,6 +324,7 @@ const Calendar = () => {
     </div>
   );
 };
-
 export default Calendar;
+export default Calendar;
+
 

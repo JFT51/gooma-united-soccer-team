@@ -1,0 +1,10 @@
+/* Gochi Hand font import */
+@import url('https://fonts.googleapis.com/css2?family=Gochi+Hand&display=swap');
+
+.slogan-gochi {
+  font-family: 'Gochi Hand', cursive;
+  font-size: 2rem;
+  color: #d32f2f;
+  text-align: center;
+  margin: 2rem 0;
+}
