@@ -43,8 +43,11 @@ export const AuthProvider = ({ children }) => {
 
   // Sign in function
   const signin = async (email, password) => {
+    console.log('Attempting to sign in user:', email);
     await setPersistence(auth, browserLocalPersistence);
-    return await signInWithEmailAndPassword(auth, email, password);
+    const result = await signInWithEmailAndPassword(auth, email, password);
+    console.log('Sign in successful for user:', result.user.email);
+    return result;
   };
 
   // Sign out function
@@ -69,9 +72,11 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      console.log('Auth state changed:', user ? user.email : 'No user');
       setCurrentUser(user);
       if (user) {
         const role = await getUserRole(user.uid);
+        console.log('User role:', role);
         setUserRole(role);
       } else {
         setUserRole(null);

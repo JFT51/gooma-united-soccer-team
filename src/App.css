@@ -1,6 +1,11 @@
+/* Import Tailwind CSS */
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@300;400;500;600;700;800;900&family=Gochi+Hand&display=swap');
+
+/* Custom CSS Variables and Theme */
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -41,80 +46,141 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/* Light Theme Colors */
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  --background: oklch(0.98 0.01 240); /* Light Grayish Blue */
+  --foreground: oklch(0.1 0.05 240); /* Dark Slate Blue */
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(0.1 0.05 240);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --popover-foreground: oklch(0.1 0.05 240);
+  --primary: oklch(0.6 0.2 20); /* Vibrant Red */
+  --primary-foreground: oklch(0.98 0.01 240);
+  --secondary: oklch(0.9 0.02 240); /* Light Steel Blue */
+  --secondary-foreground: oklch(0.1 0.05 240);
+  --muted: oklch(0.9 0.02 240);
+  --muted-foreground: oklch(0.4 0.03 240); /* Slate Gray */
+  --accent: oklch(0.95 0.05 260); /* Soft Violet */
+  --accent-foreground: oklch(0.1 0.05 240);
+  --destructive: oklch(0.5 0.25 25); /* Stronger Red for alerts */
+  --border: oklch(0.85 0.02 240); /* Light Gray */
+  --input: oklch(0.85 0.02 240);
+  --ring: oklch(0.6 0.2 20);
+  --chart-1: oklch(0.6 0.2 20);
+  --chart-2: oklch(0.7 0.15 150); /* Teal */
+  --chart-3: oklch(0.8 0.2 50); /* Gold */
+  --chart-4: oklch(0.65 0.2 280); /* Purple */
+  --chart-5: oklch(0.75 0.18 220); /* Sky Blue */
 }
 
+/* Dark Theme Colors */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: oklch(0.1 0.05 240); /* Dark Slate Blue */
+  --foreground: oklch(0.98 0.01 240); /* Light Grayish Blue */
+  --card: oklch(0.15 0.06 240); /* Slightly Lighter Dark Slate Blue */
+  --card-foreground: oklch(0.98 0.01 240);
+  --popover: oklch(0.15 0.06 240);
+  --popover-foreground: oklch(0.98 0.01 240);
+  --primary: oklch(0.6 0.2 20); /* Vibrant Red */
+  --primary-foreground: oklch(0.98 0.01 240);
+  --secondary: oklch(0.2 0.07 240); /* Darker Steel Blue */
+  --secondary-foreground: oklch(0.98 0.01 240);
+  --muted: oklch(0.2 0.07 240);
+  --muted-foreground: oklch(0.7 0.01 240); /* Lighter Gray */
+  --accent: oklch(0.3 0.1 260); /* Muted Violet */
+  --accent-foreground: oklch(0.98 0.01 240);
+  --destructive: oklch(0.6 0.25 25);
+  --border: oklch(0.25 0.05 240); /* Darker Gray */
+  --input: oklch(0.25 0.05 240);
+  --ring: oklch(0.6 0.2 20);
 }
 
+/* Base Styles */
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+    font-family: 'League Spartan', sans-serif;
   }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Gochi Hand', cursive;
+  }
+}
+
+/* Custom Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Custom Utilities */
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.6s ease-out;
+}
+
+/* Scrollbar Styles */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--muted);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ring);
+}
+
+/* Focus Styles */
+.focus-ring {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Hover Effects */
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(220, 38, 38, 0.15);
 }

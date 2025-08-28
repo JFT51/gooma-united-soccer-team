@@ -73,7 +73,7 @@ const Home = () => {
               GOOMA
               <span className="block text-red-400" style={{textShadow: '3px 3px 6px rgba(0,0,0,0.9)'}}>UNITED</span>
             </h1>
-            <p className="text-xl md:text-2xl mb-8 text-gray-100 max-w-2xl mx-auto" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.8)'}}>
+            <p className="text-xl md:text-2xl mb-8 text-gray-100 max-w-2xl mx-auto font-gochi" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.8)'}}>
               {t('home.hero.subtitle')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -116,87 +116,34 @@ const Home = () => {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Club Statistics</h2>
-            <p className="text-red-100 text-lg">Our journey and achievements over the years</p>
+            <p className="text-2xl font-gochi">When Gooma is United, they will never be divided</p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div className="bg-white bg-opacity-10 rounded-xl p-6 backdrop-blur-sm transform hover:scale-105 transition-all duration-300 hover:bg-opacity-20">
-              <div className="text-4xl md:text-5xl font-bold mb-3 text-white">15</div>
-              <div className="text-red-100 font-medium">{t('home.stats.yearsExcellence')}</div>
+              <div className="text-4xl md:text-5xl font-bold mb-3 text-black">15</div>
+              <div className="text-red-800 font-medium">{t('home.stats.yearsExcellence')}</div>
             </div>
             <div className="bg-white bg-opacity-10 rounded-xl p-6 backdrop-blur-sm transform hover:scale-105 transition-all duration-300 hover:bg-opacity-20">
-              <div className="text-4xl md:text-5xl font-bold mb-3 text-white">3</div>
-              <div className="text-red-100 font-medium">{t('home.stats.leagueTitles')}</div>
+              <div className="text-4xl md:text-5xl font-bold mb-3 text-black">3</div>
+              <div className="text-red-800 font-medium">{t('home.stats.leagueTitles')}</div>
             </div>
             <div className="bg-white bg-opacity-10 rounded-xl p-6 backdrop-blur-sm transform hover:scale-105 transition-all duration-300 hover:bg-opacity-20">
-              <div className="text-4xl md:text-5xl font-bold mb-3 text-white">25</div>
-              <div className="text-red-100 font-medium">{t('home.stats.squadPlayers')}</div>
+              <div className="text-4xl md:text-5xl font-bold mb-3 text-black">25</div>
+              <div className="text-red-800 font-medium">{t('home.stats.squadPlayers')}</div>
             </div>
             <div className="bg-white bg-opacity-10 rounded-xl p-6 backdrop-blur-sm transform hover:scale-105 transition-all duration-300 hover:bg-opacity-20">
-              <div className="text-4xl md:text-5xl font-bold mb-3 text-white">10K</div>
-              <div className="text-red-100 font-medium">{t('home.stats.loyalFans')}</div>
+              <div className="text-4xl md:text-5xl font-bold mb-3 text-black">10K</div>
+              <div className="text-red-800 font-medium">{t('home.stats.loyalFans')}</div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Upcoming Matches */}
-      <section className="py-20 bg-gradient-to-b from-gray-50 to-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">{t('home.upcomingMatches.title')}</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">{t('home.upcomingMatches.subtitle')}</p>
-          </div>
-
-          {loading ? (
-            <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto"></div>
-              <p className="mt-4 text-gray-600">{t('home.upcomingMatches.loading')}</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-              {upcomingMatches.length > 0 ? upcomingMatches.map((match, index) => (
-                <div key={index} className="bg-white rounded-2xl shadow-xl p-8 transform hover:scale-105 transition-all duration-300 hover:shadow-2xl border border-gray-100">
-                  <div className="text-center">
-                    <div className="inline-block bg-red-50 text-red-600 px-4 py-2 rounded-full text-sm font-semibold mb-4">
-                      {match.competition}
-                    </div>
-                    <div className="text-xl font-bold text-gray-900 mb-4">
-                      Gooma United <span className="text-red-600">vs</span> {match.opponent}
-                    </div>
-                    <div className="text-2xl font-bold text-red-600 mb-4 bg-red-50 rounded-lg py-3">
-                      {formatDate(match.date)}
-                    </div>
-                    <div className="text-gray-600 mb-6 flex items-center justify-center">
-                      <span className="text-lg">📍</span>
-                      <span className="ml-2">{match.venue}</span>
-                    </div>
-                    <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium ${
-                      match.isHome
-                        ? 'bg-green-100 text-green-800 border border-green-200'
-                        : 'bg-blue-100 text-blue-800 border border-blue-200'
-                    }`}>
-                      <span className={`w-2 h-2 rounded-full mr-2 ${match.isHome ? 'bg-green-400' : 'bg-blue-400'}`}></span>
-                      {match.isHome ? t('home.upcomingMatches.home') : t('home.upcomingMatches.away')}
-                    </div>
-                  </div>
-                </div>
-              )) : (
-                <div className="col-span-3 text-center py-12">
-                  <div className="text-6xl mb-4">📅</div>
-                  <p className="text-gray-500 text-lg">{t('home.upcomingMatches.noMatches')}</p>
-                </div>
-              )}
-            </div>
-          )}
-
-          <div className="text-center">
-            <Button asChild className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200">
-              <Link to="/calendar">
-                {t('home.upcomingMatches.viewFullCalendar')}
-                <ArrowRight className="ml-2" size={18} />
-              </Link>
-            </Button>
-          </div>
+      {/* Sponsor Section */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <a href="http://wwww.monsieurpneus.be" target="_blank"><img src="https://jft51.github.io/gooma-united-soccer-team/src/assets/mp.png" alt="Sponsor Logo" className="mx-auto h-80" /></a>
+          <p className="mt-4 text-2xl font-bold">Voor elke Monsieur de juiste Pneus</p>
         </div>
       </section>
 

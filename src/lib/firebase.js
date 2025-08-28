@@ -19,11 +19,19 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+
+// Only initialize analytics in production and when supported
+let analytics;
+try {
+  if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production') {
+    analytics = getAnalytics(app);
+  }
+} catch (error) {
+  console.warn('Analytics not available:', error);
+}
 
 // Initialize Firebase services
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 export { createUserWithEmailAndPassword };
-export default app;

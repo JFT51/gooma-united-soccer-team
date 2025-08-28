@@ -5,13 +5,13 @@ import { getPlayers } from '../services/database.js';
 import { useTranslation } from 'react-i18next';
 
 // Function to calculate age from birth date
-const calculateAge = (dateOfBirth) => {
-  if (!dateOfBirth) return null;
-  const birthDate = new Date(dateOfBirth);
+const calculateAge = (birthDate) => {
+  if (!birthDate) return null;
+  const birthDateObj = new Date(birthDate);
   const today = new Date();
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const monthDifference = today.getMonth() - birthDate.getMonth();
-  if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+  let age = today.getFullYear() - birthDateObj.getFullYear();
+  const monthDifference = today.getMonth() - birthDateObj.getMonth();
+  if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDateObj.getDate())) {
     age--;
   }
   return age;
@@ -32,7 +32,7 @@ const Players = () => {
       const playersWithImagesAndAge = playerData.map((player) => ({
         ...player,
         image: player.profilePicture || `https://ui-avatars.com/api/?name=${player.name}&background=random`,
-        age: calculateAge(player.dateOfBirth) // Calculate age
+        age: calculateAge(player.birthDate) // Calculate age
       }));
       setPlayers(playersWithImagesAndAge);
       setFilteredPlayers(playersWithImagesAndAge);
