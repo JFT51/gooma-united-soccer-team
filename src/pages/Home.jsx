@@ -142,7 +142,7 @@ const Home = () => {
       {/* Sponsor Section */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <img src="https://jft51.github.io/gooma-united-soccer-team/src/assets/mp.png" alt="Sponsor Logo" className="mx-auto h-48" />
+          <img src="https://jft51.github.io/gooma-united-soccer-team/src/mp.png" alt="Sponsor Logo" className="mx-auto h-48" />
           <p className="mt-4 text-2xl font-bold">Voor elke Monsieur de juiste Pneus</p>
         </div>
       </section>
