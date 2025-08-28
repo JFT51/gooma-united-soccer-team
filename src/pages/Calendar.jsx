@@ -57,6 +57,19 @@ const Calendar = () => {
     setFilteredMatches(filtered);
   }, [matches, filter, teams]);
 
+  const getSquareStyle = (color) => {
+    const style = {
+      backgroundColor: color,
+      width: '12px',
+      height: '12px',
+      marginRight: '4px',
+    };
+    if (color && color.toLowerCase() === '#ffffff') {
+      style.border = '1px solid black';
+    }
+    return style;
+  };
+
   const formatDate = (timestamp) => {
     if (!timestamp) return '';
     const date = timestamp.seconds ? new Date(timestamp.seconds * 1000) : new Date(timestamp);
@@ -192,8 +205,8 @@ const Calendar = () => {
                           <div className="text-lg font-bold text-gray-900 flex items-center justify-end">
                             {match.homeTeam && (
                               <>
-                                <div style={{ backgroundColor: match.homeTeam.club_color1, width: '12px', height: '12px', marginRight: '4px' }}></div>
-                                <div style={{ backgroundColor: match.homeTeam.club_color2, width: '12px', height: '12px', marginRight: '8px' }}></div>
+                                <div style={getSquareStyle(match.homeTeam.club_color1)}></div>
+                                <div style={getSquareStyle(match.homeTeam.club_color2)}></div>
                               </>
                             )}
                             {match.isHome ? "Gooma United" : match.opponent}
@@ -211,8 +224,8 @@ const Calendar = () => {
                           <div className="text-lg font-bold text-gray-900 flex items-center">
                             {match.awayTeam && (
                               <>
-                                <div style={{ backgroundColor: match.awayTeam.club_color1, width: '12px', height: '12px', marginRight: '4px' }}></div>
-                                <div style={{ backgroundColor: match.awayTeam.club_color2, width: '12px', height: '12px', marginRight: '8px' }}></div>
+                                <div style={getSquareStyle(match.awayTeam.club_color1)}></div>
+                                <div style={getSquareStyle(match.awayTeam.club_color2)}></div>
                               </>
                             )}
                             {match.isHome ? match.opponent : "Gooma United"}
