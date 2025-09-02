@@ -36,6 +36,10 @@ import {
   updateTeam,
 } from '../services/database';
 
+import '../App.css';
+import '../global.css';
+import '../slogan.css';
+
 const Admin = () => {
   const { currentUser, logout } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
