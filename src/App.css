@@ -2,7 +2,7 @@
 
 /* Utility class for Gochi Hand font */
 .font-gochi {
-  font-family: 'Gochi Hand', cursive !important;
+
 }
 @import "tailwindcss";
 @import "tw-animate-css";
