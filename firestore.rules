@@ -1,35 +1,43 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Publicly readable collections with write access for authenticated users.
 
-    match /matches/{matchId} {
-      allow read: if true;
-      allow write: if request.auth != null;
+    // Helper function to check for admin user
+    function isAdmin() {
+      return request.auth.token.email == 'tibo@indii.be';
     }
 
+    // Matches, News, Venues, Teams: Public read, admin-only write
+    match /matches/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /news/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /venues/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /teams/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Players: Public read, admin OR the player themselves can write
     match /players/{playerId} {
       allow read: if true;
-      allow write: if request.auth != null;
+      // Player can edit their own data, admin can edit any player.
+      // Note: 'create' is allowed for admin, 'update' for player/admin.
+      allow create: if isAdmin();
+      allow update: if isAdmin() || request.auth.uid == resource.data.userId;
+      allow delete: if isAdmin();
     }
 
-    match /news/{newsId} {
-      allow read: if true;
-      allow write: if request.auth != null;
-    }
-
-    match /venues/{venueId} {
-      allow read: if true;
-      allow write: if request.auth != null;
-    }
-
-    // Users collection (for user roles)
+    // Users: A user can only access their own user document
     match /users/{userId} {
-      // Allow users to read and write their own data
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-
-      // Allow admin users to read all user data
-      allow read: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      allow read, write: if request.auth.uid == userId;
     }
   }
 }
