@@ -35,6 +35,7 @@ import {
   getTeams,
   updateTeam,
   addTenueIconToAllTeams,
+  uniformiseMatchData,
 } from '../services/database';
 
 const Admin = () => {
@@ -64,7 +65,10 @@ const Admin = () => {
     time: '',
     venue: '',
     type: 'home',
-    competition: 'League'
+    competition: 'League',
+    status: 'upcoming',
+    result_home: '',
+    result_away: ''
   });
 
   const [playerForm, setPlayerForm] = useState({
@@ -198,13 +202,44 @@ const Admin = () => {
     }
   };
 
+  const handleUniformiseMatches = async () => {
+    if (!window.confirm('Are you sure you want to uniformise all match data? This will add default fields to older entries.')) {
+      return;
+    }
+    setLoading(true);
+    try {
+      const result = await uniformiseMatchData();
+      alert(result.message);
+    } catch (error) {
+      console.error('Error uniformising matches:', error);
+      alert('An error occurred while uniformising matches.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleAddMatch = async () => {
     try {
       setLoading(true);
-      await addMatch({
-        ...matchForm,
-        createdAt: new Date()
-      });
+
+      const matchData = { ...matchForm };
+      if (matchData.status === 'completed') {
+        matchData.result = {
+          home: parseInt(matchData.result_home, 10) || 0,
+          away: parseInt(matchData.result_away, 10) || 0,
+        };
+      } else {
+        matchData.result = null;
+      }
+      delete matchData.result_home;
+      delete matchData.result_away;
+
+      if (editingItem) {
+        await updateMatch(editingItem.id, matchData);
+      } else {
+        await addMatch({ ...matchData, createdAt: new Date() });
+      }
+
       await fetchData();
       setShowModal(false);
       resetMatchForm();
@@ -328,6 +363,8 @@ const Admin = () => {
             ...item,
             date: formattedDate,
             time: formattedTime,
+            result_home: item.result ? item.result.home : '',
+            result_away: item.result ? item.result.away : '',
           });
         } else if (type === 'player') {
           const playerBirthDate = item.birthDate ? new Date(item.birthDate) : '';
@@ -419,6 +456,9 @@ const Admin = () => {
             </Button>
             <Button onClick={handleUpdateTeamIcons} className="mt-2 ml-2 bg-purple-600 hover:bg-purple-700">
                 Add Tenue Icons to Teams
+            </Button>
+            <Button onClick={handleUniformiseMatches} className="mt-2 ml-2 bg-yellow-600 hover:bg-yellow-700">
+                Uniformise Match Data
             </Button>
           </div>
           <Users className="text-orange-600" size={32} />
@@ -790,6 +830,44 @@ const Admin = () => {
                     </select>
                   </div>
                 </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                  <select
+                    value={matchForm.status}
+                    onChange={(e) => setMatchForm({...matchForm, status: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                  >
+                    <option value="upcoming">Upcoming</option>
+                    <option value="completed">Completed</option>
+                  </select>
+                </div>
+
+                {matchForm.status === 'completed' && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label htmlFor="result_home" className="block text-sm font-medium text-gray-700 mb-1">Home Score</label>
+                      <input
+                        id="result_home"
+                        type="number"
+                        value={matchForm.result_home}
+                        onChange={(e) => setMatchForm({...matchForm, result_home: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="result_away" className="block text-sm font-medium text-gray-700 mb-1">Away Score</label>
+                      <input
+                        id="result_away"
+                        type="number"
+                        value={matchForm.result_away}
+                        onChange={(e) => setMatchForm({...matchForm, result_away: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                      />
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex justify-end gap-2 pt-4">
                   <Button variant="outline" onClick={closeModal}>Cancel</Button>
                   <Button onClick={handleAddMatch} disabled={loading} className="bg-red-600 hover:bg-red-700">
