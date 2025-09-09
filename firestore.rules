@@ -29,8 +29,8 @@ service cloud.firestore {
     match /players/{playerId} {
       allow read: if true;
       // Player can edit their own data, admin can edit any player.
-      // Note: 'create' is allowed for admin, 'update' for player/admin.
-      allow create: if isAdmin();
+      // A user can create their own player document, but only an admin can create for others.
+      allow create: if isAdmin() || request.auth.uid == request.resource.data.userId;
       allow update: if isAdmin() || request.auth.uid == resource.data.userId;
       allow delete: if isAdmin();
     }
