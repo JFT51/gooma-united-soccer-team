@@ -34,6 +34,7 @@ import {
   addTeam,
   getTeams,
   updateTeam,
+  addTenueIconToAllTeams,
 } from '../services/database';
 
 const Admin = () => {
@@ -144,6 +145,22 @@ const Admin = () => {
     } catch (error) {
       console.error('Error populating teams:', error);
       alert('An error occurred while populating teams.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateTeamIcons = async () => {
+    if (!window.confirm('Are you sure you want to add the tenue icon to all teams? This is a one-time operation.')) {
+      return;
+    }
+    setLoading(true);
+    try {
+      const result = await addTenueIconToAllTeams();
+      alert(result.message);
+    } catch (error) {
+      console.error('Error updating team icons:', error);
+      alert('An error occurred while updating team icons.');
     } finally {
       setLoading(false);
     }
@@ -362,6 +379,9 @@ const Admin = () => {
             <p className="text-sm font-medium text-gray-600">Team Management</p>
             <Button onClick={handlePopulateTeams} className="mt-2 bg-blue-600 hover:bg-blue-700">
                 Populate Teams from Calendar
+            </Button>
+            <Button onClick={handleUpdateTeamIcons} className="mt-2 ml-2 bg-purple-600 hover:bg-purple-700">
+                Add Tenue Icons to Teams
             </Button>
           </div>
           <Users className="text-orange-600" size={32} />
