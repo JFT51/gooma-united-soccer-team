@@ -1,30 +1,25 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Matches collection
+    // Publicly readable collections with write access for authenticated users.
+
     match /matches/{matchId} {
-      // Allow read for all users
       allow read: if true;
-
-      // Allow write (create, update, delete) for authenticated users
       allow write: if request.auth != null;
     }
 
-    // Players collection
     match /players/{playerId} {
-      // Allow read for all users
       allow read: if true;
-
-      // Allow write operations for authenticated users
       allow write: if request.auth != null;
     }
 
-    // News collection
     match /news/{newsId} {
-      // Allow read for all users
       allow read: if true;
+      allow write: if request.auth != null;
+    }
 
-      // Allow write operations for authenticated users
+    match /venues/{venueId} {
+      allow read: if true;
       allow write: if request.auth != null;
     }
 
@@ -35,15 +30,6 @@ service cloud.firestore {
 
       // Allow admin users to read all user data
       allow read: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
-    }
-
-    // Venues collection
-    match /venues/{venueId} {
-      // Allow read for all users
-      allow read: if true;
-
-      // Allow write operations for authenticated users
-      allow write: if request.auth != null;
     }
   }
 }
