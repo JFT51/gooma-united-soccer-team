@@ -29,6 +29,25 @@ export const addMatch = async (matchData) => {
   }
 };
 
+// One-time function to update all teams with the tenueicon
+export const addTenueIconToAllTeams = async () => {
+  try {
+    const teams = await getTeams();
+    const updatePromises = teams.map(team => {
+      const teamRef = doc(db, 'teams', team.id);
+      return updateDoc(teamRef, {
+        tenueicon: '/assets/gu.svg'
+      });
+    });
+    await Promise.all(updatePromises);
+    console.log('All teams updated successfully with tenueicon.');
+    return { success: true, message: `Updated ${teams.length} teams.` };
+  } catch (error) {
+    console.error('Error updating teams with tenueicon:', error);
+    throw error;
+  }
+};
+
 
 export const uploadProfilePicture = async (file, userId) => {
   try {
