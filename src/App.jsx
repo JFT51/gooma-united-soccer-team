@@ -10,9 +10,6 @@ import News from './pages/News.jsx';
 import History from './pages/History.jsx';
 import Admin from './pages/Admin.jsx';
 import PlayerProfile from './pages/PlayerProfile.jsx';
-import './App.css';
-import './global.css';
-import './slogan.css';
 
 function App() {
   return (

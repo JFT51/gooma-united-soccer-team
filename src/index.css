@@ -1,12 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Gochi+Hand&display=swap');
+@import "tailwindcss";
+@import "tw-animate-css";
 
 /* Utility class for Gochi Hand font */
 .font-gochi {
   font-family: '"Gochi Hand"', cursive;
 }
-
-@import "tailwindcss";
-@import "tw-animate-css";
 
 /* Removed unsupported @custom-variant at-rule */
 
