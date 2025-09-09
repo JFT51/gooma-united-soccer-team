@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar as CalendarIcon, MapPin, Clock, Trophy, Home, Plane } from 'lucide-react';
-import { getMatches } from '../services/database';
+import { getMatches, getTeams } from '../services/database';
 import { useTranslation } from 'react-i18next';
 
 const Calendar = () => {
@@ -11,12 +11,23 @@ const Calendar = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const matchData = await getMatches();
+        const [matchData, teamsData] = await Promise.all([
+          getMatches(),
+          getTeams()
+        ]);
 
-        // Sort matches by date ascending
-        const sortedMatches = matchData.sort((a, b) => new Date(a.date) - new Date(b.date));
+        const teamsMap = new Map(teamsData.map(team => [team.name, team]));
+        const goomaUnitedData = { name: 'Gooma United', tenueicon: '/assets/gu.svg' };
 
-        // Group matches by month
+        const enrichedMatches = matchData.map(match => {
+          const opponentTeamData = teamsMap.get(match.opponent) || { name: match.opponent };
+          const homeTeam = match.isHome ? goomaUnitedData : opponentTeamData;
+          const awayTeam = match.isHome ? opponentTeamData : goomaUnitedData;
+          return { ...match, homeTeam, awayTeam };
+        });
+
+        const sortedMatches = enrichedMatches.sort((a, b) => new Date(a.date) - new Date(b.date));
+
         const grouped = sortedMatches.reduce((acc, match) => {
           const date = match.date.seconds ? new Date(match.date.seconds * 1000) : new Date(match.date);
           const monthYear = date.toLocaleString(i18n.language, { month: 'long', year: 'numeric' });
@@ -77,15 +88,21 @@ const Calendar = () => {
         </div>
 
         <div className="flex items-center my-2">
-          <div className="flex-1 text-right font-bold text-lg pr-4">{match.isHome ? 'Gooma United' : match.opponent}</div>
-          <div className="text-center">
+          <div className="flex-1 text-right font-bold text-lg pr-4 flex justify-end items-center">
+            <span>{match.homeTeam.name}</span>
+            {match.homeTeam.tenueicon && <img src={match.homeTeam.tenueicon} alt={match.homeTeam.name} className="w-8 h-8 ml-2" />}
+          </div>
+          <div className="text-center px-2">
             {match.status === 'completed' && match.result ? (
               <span className="text-xl font-bold text-gray-800 bg-gray-100 px-3 py-1 rounded-md">{match.result.home} - {match.result.away}</span>
             ) : (
               <span className="text-lg font-semibold text-gray-400">VS</span>
             )}
           </div>
-          <div className="flex-1 font-bold text-lg pl-4">{match.isHome ? match.opponent : 'Gooma United'}</div>
+          <div className="flex-1 font-bold text-lg pl-4 flex items-center">
+            {match.awayTeam.tenueicon && <img src={match.awayTeam.tenueicon} alt={match.awayTeam.name} className="w-8 h-8 mr-2" />}
+            <span>{match.awayTeam.name}</span>
+          </div>
         </div>
 
         <div className="flex items-center text-sm text-gray-500 border-t border-gray-100 pt-2 mt-2">
