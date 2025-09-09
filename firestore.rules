@@ -2,9 +2,9 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper function to check for admin user
+    // Helper function to check for admin user by their unique ID (UID)
     function isAdmin() {
-      return request.auth.token.email == 'tibo@indii.be';
+      return request.auth.uid == 'NJp83l2DBcPjAz7kR03nQ9MjIYZ2';
     }
 
     // Matches, News, Venues, Teams: Public read, admin-only write
@@ -29,8 +29,8 @@ service cloud.firestore {
     match /players/{playerId} {
       allow read: if true;
       // Player can edit their own data, admin can edit any player.
-      // Note: 'create' is allowed for admin, 'update' for player/admin.
-      allow create: if isAdmin();
+      // A user can create their own player document, but only an admin can create for others.
+      allow create: if isAdmin() || request.auth.uid == request.resource.data.userId;
       allow update: if isAdmin() || request.auth.uid == resource.data.userId;
       allow delete: if isAdmin();
     }

@@ -101,20 +101,52 @@ const Admin = () => {
     console.log('fetchData called');
     setLoading(true);
     try {
-      console.log('Fetching data from Firestore...');
-      const [matchesData, playersData, newsData, teamsData] = await Promise.all([
+      console.log('Fetching all data from Firestore...');
+      const results = await Promise.allSettled([
         getMatches(),
         getPlayers(),
         getNewsPosts(),
         getTeams()
       ]);
-      console.log('Data fetched successfully:', { matchesData, playersData, newsData, teamsData });
-      setMatches(matchesData);
-      setPlayers(playersData);
-      setNews(newsData);
-      setTeams(teamsData);
+
+      const [matchesResult, playersResult, newsResult, teamsResult] = results;
+
+      if (matchesResult.status === 'fulfilled') {
+        setMatches(matchesResult.value);
+        console.log('Matches loaded successfully.');
+      } else {
+        console.error('Failed to fetch matches:', matchesResult.reason);
+        alert(`Failed to load matches: ${matchesResult.reason.message}`);
+      }
+
+      if (playersResult.status === 'fulfilled') {
+        setPlayers(playersResult.value);
+        console.log('Players loaded successfully.');
+      } else {
+        console.error('Failed to fetch players:', playersResult.reason);
+        alert(`Failed to load players: ${playersResult.reason.message}`);
+      }
+
+      if (newsResult.status === 'fulfilled') {
+        setNews(newsResult.value);
+        console.log('News loaded successfully.');
+      } else {
+        console.error('Failed to fetch news:', newsResult.reason);
+        alert(`Failed to load news: ${newsResult.reason.message}`);
+      }
+
+      if (teamsResult.status === 'fulfilled') {
+        setTeams(teamsResult.value);
+        console.log('Teams loaded successfully.');
+      } else {
+        console.error('Failed to fetch teams:', teamsResult.reason);
+        alert(`Failed to load teams: ${teamsResult.reason.message}`);
+      }
+
     } catch (error) {
-      console.error('Error in fetchData:', error);
+      // This will catch errors in Promise.allSettled itself, which is unlikely.
+      console.error('A critical error occurred in fetchData:', error);
+      alert(`A critical error occurred: ${error.message}`);
     } finally {
       console.log('fetchData finished');
       setLoading(false);
@@ -217,6 +249,11 @@ const Admin = () => {
       await fetchData();
       setShowModal(false);
       resetPlayerForm();
+
+      if (!editingItem) {
+        alert('Player created successfully! For security, you will now be logged out. Please log in again to continue.');
+        logout();
+      }
     } catch (error) {
       console.error('Error adding/updating player:', error);
       alert(`Error: ${error.message}`); // Provide user feedback on error
