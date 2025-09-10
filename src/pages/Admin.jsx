@@ -34,8 +34,6 @@ import {
   addTeam,
   getTeams,
   updateTeam,
-  addTenueIconToAllTeams,
-  uniformiseMatchData,
 } from '../services/database';
 
 const Admin = () => {
@@ -60,15 +58,15 @@ const Admin = () => {
 
   // Form states
   const [matchForm, setMatchForm] = useState({
-    opponent: '',
+    homeTeam: '',
+    visitorsTeam: '',
+    homeScore: 0,
+    visitorsScore: 0,
     date: '',
     time: '',
     venue: '',
-    type: 'home',
-    competition: 'League',
     status: 'upcoming',
-    result_home: '',
-    result_away: ''
+    competition: 'League'
   });
 
   const [playerForm, setPlayerForm] = useState({
@@ -104,6 +102,7 @@ const Admin = () => {
   const fetchData = async () => {
     console.log('fetchData called');
     setLoading(true);
+    const errorMessages = [];
     try {
       console.log('Fetching all data from Firestore...');
       const results = await Promise.allSettled([
@@ -117,38 +116,37 @@ const Admin = () => {
 
       if (matchesResult.status === 'fulfilled') {
         setMatches(matchesResult.value);
-        console.log('Matches loaded successfully.');
       } else {
         console.error('Failed to fetch matches:', matchesResult.reason);
-        alert(`Failed to load matches: ${matchesResult.reason.message}`);
+        errorMessages.push('Failed to load matches.');
       }
 
       if (playersResult.status === 'fulfilled') {
         setPlayers(playersResult.value);
-        console.log('Players loaded successfully.');
       } else {
         console.error('Failed to fetch players:', playersResult.reason);
-        alert(`Failed to load players: ${playersResult.reason.message}`);
+        errorMessages.push('Failed to load players.');
       }
 
       if (newsResult.status === 'fulfilled') {
         setNews(newsResult.value);
-        console.log('News loaded successfully.');
       } else {
         console.error('Failed to fetch news:', newsResult.reason);
-        alert(`Failed to load news: ${newsResult.reason.message}`);
+        errorMessages.push('Failed to load news.');
       }
 
       if (teamsResult.status === 'fulfilled') {
         setTeams(teamsResult.value);
-        console.log('Teams loaded successfully.');
       } else {
         console.error('Failed to fetch teams:', teamsResult.reason);
-        alert(`Failed to load teams: ${teamsResult.reason.message}`);
+        errorMessages.push('Failed to load teams.');
+      }
+
+      if (errorMessages.length > 0) {
+        alert(`Could not load some data:\n- ${errorMessages.join('\n- ')}`);
       }
 
     } catch (error) {
-      // This will catch errors in Promise.allSettled itself, which is unlikely.
       console.error('A critical error occurred in fetchData:', error);
       alert(`A critical error occurred: ${error.message}`);
     } finally {
@@ -161,23 +159,30 @@ const Admin = () => {
     setLoading(true);
     try {
       const matches = await getMatches();
-      const teamNames = new Set(matches.map(match => match.opponent));
-      teamNames.add("Gooma United");
+      const teamNames = new Set();
+      matches.forEach(match => {
+        if (match.homeTeam) teamNames.add(match.homeTeam);
+        if (match.visitorsTeam) teamNames.add(match.visitorsTeam);
+      });
+
+      const existingTeams = await getTeams();
+      const existingTeamNames = new Set(existingTeams.map(t => t.name));
 
       let newTeamsCount = 0;
       for (const name of teamNames) {
-        const existingTeam = await getTeamByName(name);
-        if (!existingTeam) {
+        if (!existingTeamNames.has(name)) {
           await addTeam({
             name: name,
             home_address: "",
             club_color1: "#000000",
             club_color2: "#FFFFFF",
+            tenueicon: name === "Gooma United" ? "/assets/gu.svg" : ""
           });
           newTeamsCount++;
         }
       }
       alert(`${newTeamsCount} new teams have been populated. Please refresh if you don't see them in the Teams tab.`);
+      fetchData(); // Refresh data to show new teams
     } catch (error) {
       console.error('Error populating teams:', error);
       alert('An error occurred while populating teams.');
@@ -186,65 +191,38 @@ const Admin = () => {
     }
   };
 
-  const handleUpdateTeamIcons = async () => {
-    if (!window.confirm('Are you sure you want to add the tenue icon to all teams? This is a one-time operation.')) {
-      return;
-    }
-    setLoading(true);
-    try {
-      const result = await addTenueIconToAllTeams();
-      alert(result.message);
-    } catch (error) {
-      console.error('Error updating team icons:', error);
-      alert('An error occurred while updating team icons.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleUniformiseMatches = async () => {
-    if (!window.confirm('Are you sure you want to uniformise all match data? This will add default fields to older entries.')) {
-      return;
-    }
-    setLoading(true);
-    try {
-      const result = await uniformiseMatchData();
-      alert(result.message);
-    } catch (error) {
-      console.error('Error uniformising matches:', error);
-      alert('An error occurred while uniformising matches.');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleAddMatch = async () => {
     try {
       setLoading(true);
 
-      const matchData = { ...matchForm };
-      if (matchData.status === 'completed') {
-        matchData.result = {
-          home: parseInt(matchData.result_home, 10) || 0,
-          away: parseInt(matchData.result_away, 10) || 0,
-        };
-      } else {
-        matchData.result = null;
-      }
-      delete matchData.result_home;
-      delete matchData.result_away;
+      // Combine date and time into a single Date object
+      const dateTimeString = `${matchForm.date}T${matchForm.time}`;
+      const matchDate = new Date(dateTimeString);
+
+      const matchData = {
+        homeTeam: matchForm.homeTeam,
+        visitorsTeam: matchForm.visitorsTeam,
+        homeScore: parseInt(matchForm.homeScore, 10) || 0,
+        visitorsScore: parseInt(matchForm.visitorsScore, 10) || 0,
+        date: matchDate,
+        venue: matchForm.venue,
+        status: matchForm.status,
+        competition: matchForm.competition,
+      };
 
       if (editingItem) {
         await updateMatch(editingItem.id, matchData);
       } else {
-        await addMatch({ ...matchData, createdAt: new Date() });
+        await addMatch(matchData);
       }
 
       await fetchData();
       setShowModal(false);
       resetMatchForm();
     } catch (error) {
-      console.error('Error adding match:', error);
+      console.error('Error adding/updating match:', error);
+      alert(`Error: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -286,8 +264,7 @@ const Admin = () => {
       resetPlayerForm();
 
       if (!editingItem) {
-        alert('Player created successfully! For security, you will now be logged out. Please log in again to continue.');
-        logout();
+        alert('Player created successfully!');
       }
     } catch (error) {
       console.error('Error adding/updating player:', error);
@@ -318,11 +295,14 @@ const Admin = () => {
 
   const resetMatchForm = () => {
     setMatchForm({
-      opponent: '',
+      homeTeam: '',
+      visitorsTeam: '',
+      homeScore: 0,
+      visitorsScore: 0,
       date: '',
       time: '',
       venue: '',
-      type: 'home',
+      status: 'upcoming',
       competition: 'League'
     });
   };
@@ -354,33 +334,34 @@ const Admin = () => {
   const openModal = (type, item = null) => {
     setModalType(type);
     setEditingItem(item);
-      if (item) {
-        if (type === 'match') {
-          const matchDate = item.date ? new Date(item.date) : new Date();
-          const formattedDate = matchDate.toISOString().split('T')[0];
-          const formattedTime = matchDate.toTimeString().slice(0, 5);
-          setMatchForm({
-            ...item,
-            date: formattedDate,
-            time: formattedTime,
-            result_home: item.result ? item.result.home : '',
-            result_away: item.result ? item.result.away : '',
-          });
-        } else if (type === 'player') {
-          const playerBirthDate = item.birthDate ? new Date(item.birthDate) : '';
-          const formattedBirthDate = playerBirthDate ? playerBirthDate.toISOString().split('T')[0] : '';
-          setPlayerForm({
-            ...item,
-            birthDate: formattedBirthDate,
-            password: '', // Never pre-fill password
-          });
-        } else if (type === 'news') {
-          setNewsForm({
-            ...item,
-            tags: item.tags ? item.tags.join(', ') : ''
-          });
-        }
+    if (item) {
+      if (type === 'match') {
+        // Defensively handle date conversion from Firestore Timestamp or JS Date
+        const dateObj = item.date?.toDate ? item.date.toDate() : new Date(item.date || new Date());
+        const formattedDate = dateObj.toISOString().split('T')[0];
+        const formattedTime = dateObj.toTimeString().slice(0, 5);
+        setMatchForm({
+          ...item,
+          date: formattedDate,
+          time: formattedTime,
+          homeScore: item.homeScore || 0,
+          visitorsScore: item.visitorsScore || 0,
+        });
+      } else if (type === 'player') {
+        const playerBirthDate = item.birthDate ? new Date(item.birthDate) : '';
+        const formattedBirthDate = playerBirthDate ? playerBirthDate.toISOString().split('T')[0] : '';
+        setPlayerForm({
+          ...item,
+          birthDate: formattedBirthDate,
+          password: '',
+        });
+      } else if (type === 'news') {
+        setNewsForm({
+          ...item,
+          tags: item.tags ? item.tags.join(', ') : ''
+        });
       }
+    }
     setShowModal(true);
   };
 
@@ -454,12 +435,6 @@ const Admin = () => {
             <Button onClick={handlePopulateTeams} className="mt-2 bg-blue-600 hover:bg-blue-700">
                 Populate Teams from Calendar
             </Button>
-            <Button onClick={handleUpdateTeamIcons} className="mt-2 ml-2 bg-purple-600 hover:bg-purple-700">
-                Add Tenue Icons to Teams
-            </Button>
-            <Button onClick={handleUniformiseMatches} className="mt-2 ml-2 bg-yellow-600 hover:bg-yellow-700">
-                Uniformise Match Data
-            </Button>
           </div>
           <Users className="text-orange-600" size={32} />
         </div>
@@ -478,6 +453,7 @@ const Admin = () => {
           home_address: team.home_address,
           club_color1: team.club_color1,
           club_color2: team.club_color2,
+          tenueicon: team.tenueicon,
         });
         alert('Team updated successfully!');
       } catch (error) {
@@ -496,32 +472,37 @@ const Admin = () => {
             {teams.map((team) => (
               <div key={team.id} className="border rounded-lg p-4">
                 <h3 className="font-bold mb-2">{team.name}</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Home Address</label>
-                    <input
-                      type="text"
-                      value={team.home_address || ''}
-                      onChange={(e) => handleTeamUpdate(team.id, 'home_address', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Club Color 1</label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <input
+                    type="text"
+                    placeholder="Home Address"
+                    value={team.home_address || ''}
+                    onChange={(e) => handleTeamUpdate(team.id, 'home_address', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Tenue Icon URL"
+                    value={team.tenueicon || ''}
+                    onChange={(e) => handleTeamUpdate(team.id, 'tenueicon', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  />
+                  <div className="flex items-center">
+                    <label className="mr-2">Color 1:</label>
                     <input
                       type="color"
                       value={team.club_color1 || '#000000'}
                       onChange={(e) => handleTeamUpdate(team.id, 'club_color1', e.target.value)}
-                      className="w-full h-10 px-1 py-1 border border-gray-300 rounded-md"
+                      className="h-10 w-16 px-1 py-1 border border-gray-300 rounded-md"
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Club Color 2</label>
+                  <div className="flex items-center">
+                    <label className="mr-2">Color 2:</label>
                     <input
                       type="color"
                       value={team.club_color2 || '#FFFFFF'}
                       onChange={(e) => handleTeamUpdate(team.id, 'club_color2', e.target.value)}
-                      className="w-full h-10 px-1 py-1 border border-gray-300 rounded-md"
+                      className="h-10 w-16 px-1 py-1 border border-gray-300 rounded-md"
                     />
                   </div>
                 </div>
@@ -554,24 +535,26 @@ const Admin = () => {
           <table className="w-full">
             <thead>
               <tr className="border-b">
-                <th className="text-left py-2">Opponent</th>
+                <th className="text-left py-2">Home Team</th>
+                <th className="text-left py-2">Away Team</th>
+                <th className="text-left py-2">Score</th>
                 <th className="text-left py-2">Date</th>
-                <th className="text-left py-2">Venue</th>
-                <th className="text-left py-2">Type</th>
+                <th className="text-left py-2">Status</th>
                 <th className="text-left py-2">Actions</th>
               </tr>
             </thead>
             <tbody>
               {matches.map((match) => (
                 <tr key={match.id} className="border-b">
-                  <td className="py-2">{match.opponent}</td>
+                  <td className="py-2">{match.homeTeam}</td>
+                  <td className="py-2">{match.visitorsTeam}</td>
+                  <td className="py-2">{match.status === 'completed' ? `${match.homeScore} - ${match.visitorsScore}` : 'N/A'}</td>
                   <td className="py-2">{formatDate(match.date)}</td>
-                  <td className="py-2">{match.venue}</td>
                   <td className="py-2">
                     <span className={`px-2 py-1 rounded text-xs ${
-                      match.type === 'home' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
+                      match.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
                     }`}>
-                      {match.type}
+                      {match.status}
                     </span>
                   </td>
                   <td className="py-2">
@@ -587,7 +570,7 @@ const Admin = () => {
                           if (window.confirm('Are you sure you want to delete this match?')) {
                             setLoading(true);
                             try {
-                              console.log('Attempting to delete match:', match.id, match.opponent);
+                              console.log('Attempting to delete match:', match.id);
                               await deleteMatch(match.id);
                               console.log('Match deleted successfully from database');
 
@@ -758,16 +741,27 @@ const Admin = () => {
           <div className="p-6">
             {modalType === 'match' && (
               <div className="space-y-4">
-                <div>
-                  <label htmlFor="opponent" className="block text-sm font-medium text-gray-700 mb-1">Opponent</label>
-                  <input
-                    id="opponent"
-                    type="text"
-                    value={matchForm.opponent}
-                    onChange={(e) => setMatchForm({...matchForm, opponent: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                    autoComplete="organization"
-                  />
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="homeTeam" className="block text-sm font-medium text-gray-700 mb-1">Home Team</label>
+                    <input
+                      id="homeTeam"
+                      type="text"
+                      value={matchForm.homeTeam}
+                      onChange={(e) => setMatchForm({...matchForm, homeTeam: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="visitorsTeam" className="block text-sm font-medium text-gray-700 mb-1">Visitors Team</label>
+                    <input
+                      id="visitorsTeam"
+                      type="text"
+                      value={matchForm.visitorsTeam}
+                      onChange={(e) => setMatchForm({...matchForm, visitorsTeam: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    />
+                  </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -778,7 +772,6 @@ const Admin = () => {
                       value={matchForm.date}
                       onChange={(e) => setMatchForm({...matchForm, date: e.target.value})}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                      autoComplete="off"
                     />
                   </div>
                   <div>
@@ -789,7 +782,6 @@ const Admin = () => {
                       value={matchForm.time}
                       onChange={(e) => setMatchForm({...matchForm, time: e.target.value})}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                      autoComplete="off"
                     />
                   </div>
                 </div>
@@ -801,22 +793,9 @@ const Admin = () => {
                     value={matchForm.venue}
                     onChange={(e) => setMatchForm({...matchForm, venue: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                    autoComplete="off"
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
-                    <select
-                      value={matchForm.type}
-                      onChange={(e) => setMatchForm({...matchForm, type: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                    >
-                      <option value="home">Thuismatch</option>
-                      <option value="away">Uitmatch</option>
-                      <option value="other">Andere Locatie</option>
-                    </select>
-                  </div>
+                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Competition</label>
                     <select
@@ -829,39 +808,38 @@ const Admin = () => {
                       <option value="Vriendschappelijk">Vriendschappelijk</option>
                     </select>
                   </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                  <select
-                    value={matchForm.status}
-                    onChange={(e) => setMatchForm({...matchForm, status: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                  >
-                    <option value="upcoming">Upcoming</option>
-                    <option value="completed">Completed</option>
-                  </select>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                    <select
+                      value={matchForm.status}
+                      onChange={(e) => setMatchForm({...matchForm, status: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    >
+                      <option value="upcoming">Upcoming</option>
+                      <option value="completed">Completed</option>
+                    </select>
+                  </div>
                 </div>
 
                 {matchForm.status === 'completed' && (
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="result_home" className="block text-sm font-medium text-gray-700 mb-1">Home Score</label>
+                      <label htmlFor="homeScore" className="block text-sm font-medium text-gray-700 mb-1">Home Score</label>
                       <input
-                        id="result_home"
+                        id="homeScore"
                         type="number"
-                        value={matchForm.result_home}
-                        onChange={(e) => setMatchForm({...matchForm, result_home: e.target.value})}
+                        value={matchForm.homeScore}
+                        onChange={(e) => setMatchForm({...matchForm, homeScore: e.target.value})}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
                       />
                     </div>
                     <div>
-                      <label htmlFor="result_away" className="block text-sm font-medium text-gray-700 mb-1">Away Score</label>
+                      <label htmlFor="visitorsScore" className="block text-sm font-medium text-gray-700 mb-1">Visitors Score</label>
                       <input
-                        id="result_away"
+                        id="visitorsScore"
                         type="number"
-                        value={matchForm.result_away}
-                        onChange={(e) => setMatchForm({...matchForm, result_away: e.target.value})}
+                        value={matchForm.visitorsScore}
+                        onChange={(e) => setMatchForm({...matchForm, visitorsScore: e.target.value})}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
                       />
                     </div>

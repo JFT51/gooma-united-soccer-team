@@ -29,52 +29,6 @@ export const addMatch = async (matchData) => {
   }
 };
 
-// One-time function to uniformise match data
-export const uniformiseMatchData = async () => {
-  try {
-    const matches = await getMatches();
-    const updatePromises = [];
-    matches.forEach(match => {
-      if (match.status === undefined || match.result === undefined) {
-        const matchRef = doc(db, 'matches', match.id);
-        updatePromises.push(updateDoc(matchRef, {
-          status: match.status || 'upcoming',
-          result: match.result || null
-        }));
-      }
-    });
-
-    if (updatePromises.length === 0) {
-      return { success: true, message: 'All matches are already uniform.' };
-    }
-
-    await Promise.all(updatePromises);
-    console.log(`${updatePromises.length} matches updated successfully.`);
-    return { success: true, message: `Uniformised ${updatePromises.length} matches.` };
-  } catch (error) {
-    console.error('Error uniformising match data:', error);
-    throw error;
-  }
-};
-
-// One-time function to update all teams with the tenueicon
-export const addTenueIconToAllTeams = async () => {
-  try {
-    const teams = await getTeams();
-    const updatePromises = teams.map(team => {
-      const teamRef = doc(db, 'teams', team.id);
-      return updateDoc(teamRef, {
-        tenueicon: '/assets/gu.svg'
-      });
-    });
-    await Promise.all(updatePromises);
-    console.log('All teams updated successfully with tenueicon.');
-    return { success: true, message: `Updated ${teams.length} teams.` };
-  } catch (error) {
-    console.error('Error updating teams with tenueicon:', error);
-    throw error;
-  }
-};
 
 
 export const uploadProfilePicture = async (file, userId) => {
