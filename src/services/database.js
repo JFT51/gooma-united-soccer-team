@@ -31,28 +31,50 @@ export const addMatch = async (matchData) => {
 
 // One-time function to uniformise match data
 export const uniformiseMatchData = async () => {
+  let updatedCount = 0;
+  let errorCount = 0;
+  console.log('Starting match data uniformisation...');
+  
   try {
-    const matches = await getMatches();
-    const updatePromises = [];
-    matches.forEach(match => {
-      if (match.status === undefined || match.result === undefined) {
-        const matchRef = doc(db, 'matches', match.id);
-        updatePromises.push(updateDoc(matchRef, {
-          status: match.status || 'upcoming',
-          result: match.result || null
-        }));
-      }
-    });
+    const matchesCollection = collection(db, 'matches');
+    const querySnapshot = await getDocs(matchesCollection);
 
-    if (updatePromises.length === 0) {
-      return { success: true, message: 'All matches are already uniform.' };
+    if (querySnapshot.empty) {
+      return { success: true, message: 'No matches found to uniformise.' };
     }
 
-    await Promise.all(updatePromises);
-    console.log(`${updatePromises.length} matches updated successfully.`);
-    return { success: true, message: `Uniformised ${updatePromises.length} matches.` };
+    for (const docSnapshot of querySnapshot.docs) {
+      const matchId = docSnapshot.id;
+      const matchData = docSnapshot.data();
+      
+      console.log(`Processing match with ID: ${matchId}`);
+
+      if (matchData.status === undefined || matchData.result === undefined) {
+        try {
+          console.log(`Updating document: ${matchId}`);
+          const matchRef = doc(db, 'matches', matchId);
+          await updateDoc(matchRef, {
+            status: matchData.status || 'upcoming',
+            result: matchData.result || null
+          });
+          updatedCount++;
+          console.log(`Successfully updated document: ${matchId}`);
+        } catch (error) {
+          errorCount++;
+          console.error(`!!! FAILED to update document: ${matchId} !!!`, error);
+          // Continue to the next document
+        }
+      } else {
+        console.log(`Document ${matchId} is already uniform. Skipping.`);
+      }
+    }
+
+    const message = `Uniformisation complete. Updated: ${updatedCount}. Failed: ${errorCount}. Check console for details.`;
+    console.log(message);
+    return { success: errorCount === 0, message };
+
   } catch (error) {
-    console.error('Error uniformising match data:', error);
+    console.error('A critical error occurred during the getDocs call:', error);
     throw error;
   }
 };
